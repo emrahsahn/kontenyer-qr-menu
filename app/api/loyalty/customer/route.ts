@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server"
 import {
   getCustomerById,
   findCustomer,
-  registerCustomer
+  registerCustomer,
+  getAllCustomers
 } from "@/lib/data/loyalty-store"
 import { verifyStaffSession } from "@/lib/security/auth-guard"
 
-// GET: Retrieve customer by id, or search customers (search requires staff auth)
+// GET: Retrieve customer by id, search customers, or list all customers (staff)
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -36,10 +37,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ customers: results })
     }
 
-    return NextResponse.json(
-      { error: "Lütfen 'id' veya 'q' parametresi belirtiniz." },
-      { status: 400 }
-    )
+    // 3. All Customers List (Staff Panel)
+    const auth = verifyStaffSession(request)
+    if (!auth.authenticated) {
+      return NextResponse.json(
+        { error: "Müşteri listesini görüntülemek için personel girişi gereklidir." },
+        { status: 401 }
+      )
+    }
+
+    const all = await getAllCustomers()
+    return NextResponse.json({ customers: all })
   } catch (error) {
     console.error("Loyalty customer GET error:", error)
     return NextResponse.json(

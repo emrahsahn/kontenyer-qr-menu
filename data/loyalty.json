@@ -1,0 +1,56 @@
+{
+  "config": {
+    "id": "default_campaign",
+    "title": "Konteyner Kahve Kulübü",
+    "description": "Seçili kahve ve içeceklerde damgaları topla, bir sonraki kahven bizden hediye!",
+    "targetStamps": 4,
+    "scopeType": "all_drinks",
+    "categoryIds": [],
+    "productIds": [],
+    "rewardTitle": "1 Adet Ücretsiz Kahve",
+    "isActive": true,
+    "updatedAt": "2026-09-17T00:00:00.000Z"
+  },
+  "customers": [
+    {
+      "id": "cust_1789594030668_ht65j",
+      "phone": "05380874885",
+      "fullName": "emrah",
+      "customerCode": "KNT-7012",
+      "currentStamps": 2,
+      "freeCoffeesAvailable": 0,
+      "totalStampsEarned": 2,
+      "totalFreeRedeemed": 0,
+      "kvkkConsent": true,
+      "kvkkConsentAt": "2026-09-16T21:27:10.669Z",
+      "createdAt": "2026-09-16T21:27:10.669Z",
+      "updatedAt": "2026-09-16T21:28:25.237Z"
+    }
+  ],
+  "logs": [
+    {
+      "id": "log_1789594105237_wcjc",
+      "customerId": "cust_1789594030668_ht65j",
+      "action": "STAMP_ADD",
+      "amount": 1,
+      "previousStamps": 1,
+      "newStamps": 2,
+      "previousFree": 0,
+      "newFree": 0,
+      "staffUsername": "yali_yonetim",
+      "createdAt": "2026-09-16T21:28:25.237Z"
+    },
+    {
+      "id": "log_1789594097986_f4mf",
+      "customerId": "cust_1789594030668_ht65j",
+      "action": "STAMP_ADD",
+      "amount": 1,
+      "previousStamps": 0,
+      "newStamps": 1,
+      "previousFree": 0,
+      "newFree": 0,
+      "staffUsername": "yali_yonetim",
+      "createdAt": "2026-09-16T21:28:17.986Z"
+    }
+  ]
+}

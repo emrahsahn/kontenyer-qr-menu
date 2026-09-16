@@ -6,6 +6,7 @@ import { ProductManagementModal } from "@/components/dashboard/product-managemen
 import { CategoryManagementModal } from "@/components/dashboard/category-management-modal"
 import { MenuBackupModal } from "@/components/dashboard/menu-backup-modal"
 import { ProductDeleteDialog } from "@/components/dashboard/product-delete-dialog"
+import { LoyaltyManagerTab } from "@/components/dashboard/loyalty-manager-tab"
 import { TableQrCardPrinter } from "@/components/dashboard/table-qr-card-printer"
 import { QRCodeCanvas } from "qrcode.react"
 import Image from "next/image"
@@ -26,14 +27,15 @@ import {
   Copy,
   Check,
   ExternalLink,
-  HardDriveDownload
+  HardDriveDownload,
+  Coffee
 } from "lucide-react"
 
 // Static subscription helper for origin
 const subscribeToNothing = (_onChange: () => void) => () => {}
 
 export default function StaffPanelPage() {
-  const [activeTab, setActiveTab] = useState<"menu" | "qr">("menu")
+  const [activeTab, setActiveTab] = useState<"menu" | "loyalty" | "qr">("menu")
 
   // Menu data
   const [products, setProducts] = useState<Product[]>([])
@@ -337,6 +339,22 @@ export default function StaffPanelPage() {
                 activeTab === "menu" ? "bg-primary-foreground/20 text-primary-foreground" : "bg-secondary text-foreground/70"
               }`}>
                 {products.length}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("loyalty")}
+              className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${
+                activeTab === "loyalty"
+                  ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
+                  : "text-foreground/60 hover:text-foreground hover:bg-muted"
+              }`}
+            >
+              <Coffee className="h-4 w-4 text-amber-500" />
+              <span>Sadakat Programı</span>
+              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-amber-500/20 text-amber-600 dark:text-amber-400">
+                Damga
               </span>
             </button>
 
@@ -654,7 +672,16 @@ export default function StaffPanelPage() {
           </div>
         )}
 
-        {/* TAB 2: QR CODE & 7.5x10 CM TABLE CARD PRINTER */}
+        {/* TAB 2: LOYALTY PROGRAM & STAMP MANAGER */}
+        {activeTab === "loyalty" && (
+          <LoyaltyManagerTab
+            categories={categories}
+            products={products}
+            onShowToast={showToast}
+          />
+        )}
+
+        {/* TAB 3: QR CODE & 7.5x10 CM TABLE CARD PRINTER */}
         {activeTab === "qr" && (
           <div className="max-w-5xl mx-auto w-full flex flex-col gap-8">
             {/* 7.5x10 cm Table Card Printing & Download Suite */}

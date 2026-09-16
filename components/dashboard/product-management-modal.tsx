@@ -73,6 +73,7 @@ interface ProductManagementModalProps {
   categories: Category[]
   onSave: (productData: Partial<Product>) => Promise<void>
   onOpenCategoryModal?: () => void
+  onDelete?: (product: Product) => void
 }
 
 export function ProductManagementModal({
@@ -81,7 +82,8 @@ export function ProductManagementModal({
   product,
   categories,
   onSave,
-  onOpenCategoryModal
+  onOpenCategoryModal,
+  onDelete
 }: ProductManagementModalProps) {
   const [adTr, setAdTr] = useState("")
   const [adEn, setAdEn] = useState("")
@@ -908,14 +910,28 @@ export function ProductManagementModal({
 
           {/* Footer Sticky Action Buttons */}
           <div className="lg:col-span-12 p-4 sm:p-6 border-t border-border bg-card/95 backdrop-blur-md sticky bottom-0 z-20 flex items-center justify-between gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="px-6 py-5 rounded-2xl font-bold text-xs uppercase cursor-pointer"
-            >
-              Vazgeç
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                className="px-6 py-5 rounded-2xl font-bold text-xs uppercase cursor-pointer"
+              >
+                Vazgeç
+              </Button>
+
+              {product && onDelete && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => onDelete(product)}
+                  className="px-4 py-5 rounded-2xl font-bold text-xs uppercase text-destructive hover:bg-destructive/10 hover:text-destructive cursor-pointer flex items-center gap-1.5 transition-all"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  <span className="hidden sm:inline">Ürünü Sil</span>
+                </Button>
+              )}
+            </div>
 
             <Button
               type="submit"

@@ -5,6 +5,7 @@ import { Product, Category } from "@/lib/types/database"
 import { ProductManagementModal } from "@/components/dashboard/product-management-modal"
 import { CategoryManagementModal } from "@/components/dashboard/category-management-modal"
 import { MenuBackupModal } from "@/components/dashboard/menu-backup-modal"
+import { ProductDeleteDialog } from "@/components/dashboard/product-delete-dialog"
 import { TableQrCardPrinter } from "@/components/dashboard/table-qr-card-printer"
 import { QRCodeCanvas } from "qrcode.react"
 import Image from "next/image"
@@ -47,6 +48,7 @@ export default function StaffPanelPage() {
   // Modals
   const [isProductModalOpen, setIsProductModalOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null)
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
   const [isBackupModalOpen, setIsBackupModalOpen] = useState(false)
 
@@ -177,32 +179,30 @@ export default function StaffPanelPage() {
     }
   }
 
-  // Delete Product
-  const handleDeleteProduct = async (id: string, name: string) => {
-    if (!confirm(`"${name}" ürününü menüden silmek istediğinize emin misiniz?`)) {
-      return
+  // Delete Product with Double-Confirmation Dialog
+  const handleConfirmDeleteProduct = async (productId: string) => {
+    const targetProduct = products.find((p) => p.id === productId) || productToDelete
+    const productName = targetProduct?.ad_tr || "Ürün"
+
+    const res = await fetch(`/api/products?id=${productId}`, {
+      method: "DELETE"
+    })
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}))
+      throw new Error(errData.error || "Ürün silinemedi. Lütfen tekrar deneyin.")
     }
+
+    showToast(`"${productName}" menüden başarıyla silindi.`)
+    setProducts((prev) => prev.filter((p) => p.id !== productId))
+    setProductToDelete(null)
 
     try {
-      const res = await fetch(`/api/products?id=${id}`, {
-        method: "DELETE"
-      })
-
-      if (res.ok) {
-        showToast(`"${name}" menüden silindi.`)
-        setProducts((prev) => prev.filter((p) => p.id !== id))
-        try {
-          const bc = new BroadcastChannel("yali_menu_events")
-          bc.postMessage({ type: "MENU_UPDATED" })
-          bc.close()
-          window.dispatchEvent(new Event("yali_menu_updated"))
-        } catch {}
-      } else {
-        alert("Ürün silinemedi.")
-      }
-    } catch {
-      alert("Silme işlemi sırasında hata oluştu.")
-    }
+      const bc = new BroadcastChannel("konteyner_menu_events")
+      bc.postMessage({ type: "MENU_UPDATED" })
+      bc.close()
+      window.dispatchEvent(new Event("konteyner_menu_updated"))
+    } catch {}
   }
 
   // Category Handlers
@@ -638,9 +638,9 @@ export default function StaffPanelPage() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => handleDeleteProduct(product.id, product.ad_tr)}
+                            onClick={() => setProductToDelete(product)}
                             className="p-2 rounded-xl bg-destructive/10 hover:bg-destructive/20 text-destructive transition-all cursor-pointer"
-                            title="Sil"
+                            title="Ürünü Sil"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
@@ -741,6 +741,20 @@ export default function StaffPanelPage() {
           setIsProductModalOpen(false)
           setIsCategoryModalOpen(true)
         }}
+        onDelete={(prod) => {
+          setIsProductModalOpen(false)
+          setSelectedProduct(null)
+          setProductToDelete(prod)
+        }}
+      />
+
+      {/* Product Double-Confirmation Delete Dialog */}
+      <ProductDeleteDialog
+        isOpen={!!productToDelete}
+        onClose={() => setProductToDelete(null)}
+        product={productToDelete}
+        categoryName={categories.find((c) => c.id === productToDelete?.kategori_id)?.ad_tr}
+        onConfirmDelete={handleConfirmDeleteProduct}
       />
 
       {/* Category Management Modal */}
@@ -765,10 +779,10 @@ export default function StaffPanelPage() {
           await fetchData()
           showToast("Menü yedeği başarıyla sisteme aktarıldı!")
           try {
-            const bc = new BroadcastChannel("yali_menu_events")
+            const bc = new BroadcastChannel("konteyner_menu_events")
             bc.postMessage({ type: "MENU_UPDATED" })
             bc.close()
-            window.dispatchEvent(new Event("yali_menu_updated"))
+            window.dispatchEvent(new Event("konteyner_menu_updated"))
           } catch {}
         }}
       />

@@ -1,0 +1,457 @@
+{
+  "categories": [
+    {
+      "id": "cat-espresso",
+      "ad_tr": "Espresso & Klasikler",
+      "ad_en": "Espresso & Classics",
+      "sira": 1,
+      "created_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat-filter",
+      "ad_tr": "Nitelikli Demlemeler & Filtre",
+      "ad_en": "Specialty Brews & Filter",
+      "sira": 2,
+      "created_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat-cold",
+      "ad_tr": "Soğuk Kahveler & Cold Brew",
+      "ad_en": "Iced Coffees & Cold Brew",
+      "sira": 3,
+      "created_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat-tea",
+      "ad_tr": "Sıcak İçecekler & Bitki Çayları",
+      "ad_en": "Hot Drinks & Artisan Teas",
+      "sira": 4,
+      "created_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat-bakery",
+      "ad_tr": "Fırından Taze & Tatlılar",
+      "ad_en": "Fresh Bakery & Desserts",
+      "sira": 5,
+      "created_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "cat-breakfast",
+      "ad_tr": "Kahvaltı & Gurme Sandviçler",
+      "ad_en": "Breakfast & Gourmet Sandwiches",
+      "sira": 6,
+      "created_at": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "k-p1",
+      "kategori_id": "cat-espresso",
+      "ad_tr": "Espresso Single / Double",
+      "ad_en": "Espresso Single / Double",
+      "aciklama_tr": "Konteyner House Blend çekirdeklerinden yoğun gövdeli, fındık ve çikolata notalı taze çekim espresso.",
+      "aciklama_en": "Freshly pulled intense espresso with hazelnut and dark chocolate notes from Konteyner House Blend.",
+      "fiyat": 95,
+      "porsiyonlar": [
+        {
+          "id": "p1-opt1",
+          "ad_tr": "Single Shot",
+          "ad_en": "Single Shot",
+          "fiyat": 95
+        },
+        {
+          "id": "p1-opt2",
+          "ad_tr": "Double Shot",
+          "ad_en": "Double Shot",
+          "fiyat": 130
+        }
+      ],
+      "gorsel_url": "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=800&auto=format&fit=crop&q=80",
+      "ozellikler": {
+        "kafein": true,
+        "vegan": true,
+        "vejetaryen": true,
+        "sef_onerisi": true,
+        "alerjenler": [],
+        "kalori": 5,
+        "gramaj": "30-60 ml"
+      },
+      "aktif": true
+    },
+    {
+      "id": "k-p2",
+      "kategori_id": "cat-espresso",
+      "ad_tr": "Cortado",
+      "ad_en": "Cortado",
+      "aciklama_tr": "Eşit oranda çift shot espresso ve kadifemsi ipeksi sıcak süt köpüğü dengesi.",
+      "aciklama_en": "Perfect 1:1 balance of double shot espresso and velvety microfoam milk.",
+      "fiyat": 140,
+      "gorsel_url": "https://images.unsplash.com/photo-1534778101976-62847782c213?w=800&auto=format&fit=crop&q=80",
+      "ozellikler": {
+        "kafein": true,
+        "vejetaryen": true,
+        "alerjenler": [
+          "Süt"
+        ],
+        "kalori": 75,
+        "gramaj": "130 ml"
+      },
+      "aktif": true
+    },
+    {
+      "id": "k-p3",
+      "kategori_id": "cat-espresso",
+      "ad_tr": "Flat White",
+      "ad_en": "Flat White",
+      "aciklama_tr": "Çift shot ristretto üzerine ince mikro köpüklü buharda ısıtılmış tam yağlı süt.",
+      "aciklama_en": "Double ristretto poured over finely textured velvety steamed whole milk.",
+      "fiyat": 155,
+      "gorsel_url": "https://images.unsplash.com/photo-1577968897966-3d4325b36b61?w=800&auto=format&fit=crop&q=80",
+      "ozellikler": {
+        "kafein": true,
+        "vejetaryen": true,
+        "sef_onerisi": true,
+        "alerjenler": [
+          "Süt"
+        ],
+        "kalori": 120,
+        "gramaj": "180 ml"
+      },
+      "aktif": true
+    },
+    {
+      "id": "k-p4",
+      "kategori_id": "cat-espresso",
+      "ad_tr": "Caffe Latte",
+      "ad_en": "Caffe Latte",
+      "aciklama_tr": "Hafif espresso aroması, bol sıcak süt ve üzerinde zarif latte art köpük dokusu.",
+      "aciklama_en": "Smooth espresso layered with steamed milk and delicate latte art foam.",
+      "fiyat": 150,
+      "porsiyonlar": [
+        {
+          "id": "p4-opt1",
+          "ad_tr": "Standart (Tam Yağlı Süt)",
+          "ad_en": "Standard (Whole Milk)",
+          "fiyat": 150
+        },
+        {
+          "id": "p4-opt2",
+          "ad_tr": "Yulaf Sütü ile (Oat)",
+          "ad_en": "With Oat Milk",
+          "fiyat": 175
+        },
+        {
+          "id": "p4-opt3",
+          "ad_tr": "Badem Sütü ile (Almond)",
+          "ad_en": "With Almond Milk",
+          "fiyat": 175
+        }
+      ],
+      "gorsel_url": "https://images.unsplash.com/photo-1570968915860-54d5c301fc9f?w=800&auto=format&fit=crop&q=80",
+      "ozellikler": {
+        "kafein": true,
+        "vejetaryen": true,
+        "alerjenler": [
+          "Süt"
+        ],
+        "kalori": 145,
+        "gramaj": "240 ml"
+      },
+      "aktif": true
+    },
+    {
+      "id": "k-p5",
+      "kategori_id": "cat-espresso",
+      "ad_tr": "Salted Caramel Macchiato",
+      "ad_en": "Salted Caramel Macchiato",
+      "aciklama_tr": "Vanilya şurubu, sıcak buharlı süt, duble espresso ve ev yapımı deniz tuzlu karamel sosu.",
+      "aciklama_en": "Vanilla syrup, steamed milk, double espresso topped with homemade sea salted caramel drizzle.",
+      "fiyat": 175,
+      "gorsel_url": "https://images.unsplash.com/photo-1595928642581-f50f4f3453a5?w=800&auto=format&fit=crop&q=80",
+      "ozellikler": {
+        "kafein": true,
+        "vejetaryen": true,
+        "sef_onerisi": true,
+        "alerjenler": [
+          "Süt"
+        ],
+        "kalori": 210,
+        "gramaj": "260 ml"
+      },
+      "aktif": true
+    },
+    {
+      "id": "k-p6",
+      "kategori_id": "cat-filter",
+      "ad_tr": "V60 Hand Drip (Ethiopia Yirgacheffe)",
+      "ad_en": "V60 Hand Drip (Ethiopia Yirgacheffe)",
+      "aciklama_tr": "Yasemin çiçeği, bergamot ve şeftali notaları taşıyan, elle demlenen nitelikli açık kavrum çekirdek.",
+      "aciklama_en": "Light roast single origin beans hand-dripped with delicate notes of jasmine, bergamot, and peach.",
+      "fiyat": 165,
+      "gorsel_url": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&auto=format&fit=crop&q=80",
+      "ozellikler": {
+        "kafein": true,
+        "vegan": true,
+        "vejetaryen": true,
+        "sef_onerisi": true,
+        "alerjenler": [],
+        "kalori": 2,
+        "gramaj": "250 ml"
+      },
+      "aktif": true
+    },
+    {
+      "id": "k-p7",
+      "kategori_id": "cat-filter",
+      "ad_tr": "Chemex Demleme (Colombia Supremo)",
+      "ad_en": "Chemex Brew (Colombia Supremo)",
+      "aciklama_tr": "Kalın filtresiyle berrak ve pürüzsüz içim; esmer şeker, karamel ve kırmızı elma notaları.",
+      "aciklama_en": "Exceptionally clean and bright cup with notes of brown sugar, caramel, and red apple.",
+      "fiyat": 170,
+      "gorsel_url": "https://images.unsplash.com/photo-1521302200778-33500795e128?w=800&auto=format&fit=crop&q=80",
+      "ozellikler": {
+        "kafein": true,
+        "vegan": true,
+        "vejetaryen": true,
+        "alerjenler": [],
+        "kalori": 2,
+        "gramaj": "300 ml"
+      }
+    },
+    {
+      "id": "k-p8",
+      "kategori_id": "cat-filter",
+      "ad_tr": "Aeropress (Guatemala Antigua)",
+      "ad_en": "Aeropress (Guatemala Antigua)",
+      "aciklama_tr": "Basınçlı demleme tekniğiyle zengin kakao gövdesi, narenciye asiditesi ve dolgun bitiş.",
+      "aciklama_en": "Air-pressured brew technique revealing rich cocoa body, citrus brightness, and full finish.",
+      "fiyat": 160,
+      "gorsel_url": "https://images.unsplash.com/photo-1518832553480-cd0e625ed3e6?w=800&auto=format&fit=crop&q=80",
+      "ozellikler": {
+        "kafein": true,
+        "vegan": true,
+        "vejetaryen": true,
+        "alerjenler": [],
+        "kalori": 2,
+        "gramaj": "220 ml"
+      }
+    },
+    {
+      "id": "k-p9",
+      "kategori_id": "cat-cold",
+      "ad_tr": "24 Saat Yavaş Damıtım Cold Brew",
+      "ad_en": "24-Hour Slow Drip Cold Brew",
+      "aciklama_tr": "Buzlu suyla 24 saat boyunca damla damla demlenen, düşük asiditeli, yoğun gövdeli ferahlatıcı soğuk kahve.",
+      "aciklama_en": "Steeped for 24 hours in cold filtered water; ultra-smooth, low-acidity refreshing cold coffee.",
+      "fiyat": 170,
+      "gorsel_url": "https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=800&auto=format&fit=crop&q=80",
+      "ozellikler": {
+        "kafein": true,
+        "soğuk": true,
+        "vegan": true,
+        "vejetaryen": true,
+        "sef_onerisi": true,
+        "alerjenler": [],
+        "kalori": 5,
+        "gramaj": "300 ml"
+      }
+    },
+    {
+      "id": "k-p10",
+      "kategori_id": "cat-cold",
+      "ad_tr": "Iced Spanish Latte",
+      "ad_en": "Iced Spanish Latte",
+      "aciklama_tr": "Duble espresso, yoğunlaştırılmış tatlı süt, taze soğuk süt ve bol buzun mükemmel uyumu.",
+      "aciklama_en": "Double espresso blended with sweetened condensed milk, cold whole milk and crushed ice.",
+      "fiyat": 175,
+      "gorsel_url": "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=800&auto=format&fit=crop&q=80",
+      "ozellikler": {
+        "kafein": true,
+        "soğuk": true,
+        "vejetaryen": true,
+        "sef_onerisi": true,
+        "alerjenler": [
+          "Süt"
+        ],
+        "kalori": 240,
+        "gramaj": "350 ml"
+      }
+    },
+    {
+      "id": "k-p11",
+      "kategori_id": "cat-cold",
+      "ad_tr": "Espresso Tonic",
+      "ad_en": "Espresso Tonic",
+      "aciklama_tr": "Premium tonik, çift shot espresso, taze biberiye dalı ve kurutulmuş portakal dilimi.",
+      "aciklama_en": "Premium tonic water topped with double shot espresso, fresh rosemary sprig and dried orange.",
+      "fiyat": 165,
+      "gorsel_url": "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=800&auto=format&fit=crop&q=80",
+      "ozellikler": {
+        "kafein": true,
+        "soğuk": true,
+        "vegan": true,
+        "vejetaryen": true,
+        "alerjenler": [],
+        "kalori": 60,
+        "gramaj": "320 ml"
+      }
+    },
+    {
+      "id": "k-p12",
+      "kategori_id": "cat-tea",
+      "ad_tr": "Matcha Latte (Seremoniyel Uji)",
+      "ad_en": "Matcha Latte (Ceremonial Uji)",
+      "aciklama_tr": "Japonya Uji bölgesinden 1. sınıf seremoniyel organik matcha tozu ve buharda ısıtılmış yulaf sütü.",
+      "aciklama_en": "Grade A ceremonial organic Japanese matcha hand-whisked with steamed oat milk.",
+      "fiyat": 180,
+      "gorsel_url": "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=800&auto=format&fit=crop&q=80",
+      "ozellikler": {
+        "kafein": true,
+        "vegan": true,
+        "vejetaryen": true,
+        "sef_onerisi": true,
+        "alerjenler": [
+          "Gluten"
+        ],
+        "kalori": 110,
+        "gramaj": "250 ml"
+      }
+    },
+    {
+      "id": "k-p13",
+      "kategori_id": "cat-tea",
+      "ad_tr": "Chai Tea Latte",
+      "ad_en": "Chai Tea Latte",
+      "aciklama_tr": "Kakule, zencefil, tarçın ve karanfil baharatlarıyla demlenen siyah çay özütü ve köpüklü süt.",
+      "aciklama_en": "Black tea infused with cardamom, ginger, cinnamon, and cloves mixed with foamy milk.",
+      "fiyat": 160,
+      "gorsel_url": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=800&auto=format&fit=crop&q=80",
+      "ozellikler": {
+        "kafein": true,
+        "vejetaryen": true,
+        "alerjenler": [
+          "Süt"
+        ],
+        "kalori": 180,
+        "gramaj": "260 ml"
+      }
+    },
+    {
+      "id": "k-p14",
+      "kategori_id": "cat-bakery",
+      "ad_tr": "San Sebastian Cheesecake",
+      "ad_en": "San Sebastian Cheesecake",
+      "aciklama_tr": "İçi akışkan ve kremsi, dışı karamelize yanık kabuklu; sıcak Belçika çikolatası eşliğinde.",
+      "aciklama_en": "Basque burnt cheesecake with a rich molten center, served with warm Belgian chocolate sauce.",
+      "fiyat": 220,
+      "porsiyonlar": [
+        {
+          "id": "p14-opt1",
+          "ad_tr": "Sade / Karamel",
+          "ad_en": "Plain / Caramel",
+          "fiyat": 220
+        },
+        {
+          "id": "p14-opt2",
+          "ad_tr": "Belçika Çikolatalı",
+          "ad_en": "With Belgian Chocolate",
+          "fiyat": 250
+        }
+      ],
+      "gorsel_url": "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=800&auto=format&fit=crop&q=80",
+      "ozellikler": {
+        "vejetaryen": true,
+        "sef_onerisi": true,
+        "alerjenler": [
+          "Süt",
+          "Yumurta",
+          "Gluten"
+        ],
+        "kalori": 420,
+        "gramaj": "190 gr"
+      }
+    },
+    {
+      "id": "k-p15",
+      "kategori_id": "cat-bakery",
+      "ad_tr": "Konteyner Kruvasan (Tereyağlı)",
+      "ad_en": "Konteyner Butter Croissant",
+      "aciklama_tr": "Fransız tereyağı ile 72 kat katlanan, dışı çıtır içi puf taze fırın kruvasanı.",
+      "aciklama_en": "Flaky, buttery authentic French croissant baked fresh every morning with 72 layers.",
+      "fiyat": 120,
+      "gorsel_url": "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&auto=format&fit=crop&q=80",
+      "ozellikler": {
+        "vejetaryen": true,
+        "alerjenler": [
+          "Süt",
+          "Gluten",
+          "Yumurta"
+        ],
+        "kalori": 310,
+        "gramaj": "110 gr"
+      }
+    },
+    {
+      "id": "k-p16",
+      "kategori_id": "cat-bakery",
+      "ad_tr": "Fıstıklı Brownie & Dondurma",
+      "ad_en": "Pistachio Brownie & Gelato",
+      "aciklama_tr": "%70 Callebaut bitter çikolata, Antep fıstığı parçaları ve vanilyalı artisan dondurma.",
+      "aciklama_en": "70% dark Callebaut chocolate fudge brownie topped with Antep pistachios and vanilla gelato.",
+      "fiyat": 210,
+      "gorsel_url": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=800&auto=format&fit=crop&q=80",
+      "ozellikler": {
+        "vejetaryen": true,
+        "alerjenler": [
+          "Süt",
+          "Gluten",
+          "Yumurta",
+          "Fıstık"
+        ],
+        "kalori": 460,
+        "gramaj": "180 gr"
+      }
+    },
+    {
+      "id": "k-p17",
+      "kategori_id": "cat-breakfast",
+      "ad_tr": "Avokado & Poşe Yumurtalı Ekşi Maya",
+      "ad_en": "Avocado & Poached Egg on Sourdough",
+      "aciklama_tr": "Kızarmış artisan ekşi mayalı ekmek üzerine taze ezilmiş avokado, çift organik poşe yumurta ve çörek otu.",
+      "aciklama_en": "Artisan toasted sourdough topped with smashed avocado, two organic poached eggs, and seeds.",
+      "fiyat": 260,
+      "gorsel_url": "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&auto=format&fit=crop&q=80",
+      "ozellikler": {
+        "vejetaryen": true,
+        "sef_onerisi": true,
+        "alerjenler": [
+          "Gluten",
+          "Yumurta"
+        ],
+        "kalori": 380,
+        "gramaj": "240 gr"
+      }
+    },
+    {
+      "id": "k-p18",
+      "kategori_id": "cat-breakfast",
+      "ad_tr": "Füme Kaburga & Cheddar Kruvasan Sandviç",
+      "ad_en": "Smoked Rib & Cheddar Croissant",
+      "aciklama_tr": "Tereyağlı çıtır kruvasan arasında 8 saat dinlendirilmiş dana füme kaburga, erimiş cheddar ve hardal mayonez.",
+      "aciklama_en": "Buttery croissant stuffed with 8-hour slow smoked beef ribs, melted aged cheddar, and mustard mayo.",
+      "fiyat": 295,
+      "gorsel_url": "https://images.unsplash.com/photo-1509722747041-616f39b57569?w=800&auto=format&fit=crop&q=80",
+      "ozellikler": {
+        "sef_onerisi": true,
+        "alerjenler": [
+          "Gluten",
+          "Süt",
+          "Hardal",
+          "Yumurta"
+        ],
+        "kalori": 520,
+        "gramaj": "260 gr"
+      }
+    }
+  ]
+}

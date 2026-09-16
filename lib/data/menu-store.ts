@@ -40,19 +40,38 @@ function getLocalFileDefaults(): MenuStoreData {
 
 // Initialize Upstash Redis client with any Vercel/Upstash environment variable names
 function getRedisClient(): Redis | null {
-  const url =
+  let url =
     process.env.KV_REST_API_URL ||
     process.env.UPSTASH_REDIS_REST_URL ||
     process.env.STORAGE_REST_API_URL ||
-    process.env.STORAGE_URL ||
-    process.env.KV_URL
-  const token =
+    process.env.STORAGE_URL
+
+  let token =
     process.env.KV_REST_API_TOKEN ||
     process.env.UPSTASH_REDIS_REST_TOKEN ||
     process.env.STORAGE_REST_API_TOKEN ||
     process.env.STORAGE_TOKEN
-  
-  if (url && token) {
+
+  // Scan process.env for custom Vercel Store prefixes (e.g. KONTENYER_KV_REST_API_URL, YALI_KV_REST_API_URL, etc.)
+  if (!url || !token) {
+    for (const key of Object.keys(process.env)) {
+      if (!url && (key.endsWith("_KV_REST_API_URL") || key.endsWith("_REST_API_URL"))) {
+        url = process.env[key]
+      }
+      if (!token && (key.endsWith("_KV_REST_API_TOKEN") || key.endsWith("_REST_API_TOKEN"))) {
+        token = process.env[key]
+      }
+    }
+  }
+
+  // Ensure url is a valid HTTPS REST endpoint (not redis:// TCP protocol)
+  if (url && token && typeof url === "string") {
+    // If user or provider supplied redis:// or rediss://, log note since @upstash/redis requires REST
+    if (url.startsWith("redis://") || url.startsWith("rediss://")) {
+      console.warn("Notice: Upstash REST client requires HTTPS URL, found TCP redis URL:", url.split("@")[1] || url)
+      return null
+    }
+
     try {
       return new Redis({ url, token })
     } catch (e) {
@@ -61,6 +80,7 @@ function getRedisClient(): Redis | null {
   }
   return null
 }
+
 
 export async function getMenuStore(): Promise<MenuStoreData> {
   const now = Date.now()

@@ -12,8 +12,9 @@ import { RegisterServiceWorker } from "@/components/pwa/register-sw"
 import { InstallPrompt } from "@/components/pwa/install-prompt"
 import { QrLockScreen } from "@/components/menu/qr-lock-screen"
 import { DeveloperFooter } from "@/components/menu/developer-footer"
+import { LoyaltyStampCardModal } from "@/components/menu/loyalty-stamp-card-modal"
 import { isQrSessionValid, grantQrSession } from "@/lib/security/qr-session"
-import { Play, Search, X, UtensilsCrossed } from "lucide-react"
+import { Play, Search, X, UtensilsCrossed, Coffee, Sparkles } from "lucide-react"
 
 function MenuMainContent() {
   const { categories, products, isLoading, lang } = useTable();
@@ -22,6 +23,7 @@ function MenuMainContent() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [replayPreloader, setReplayPreloader] = useState(false);
+  const [isLoyaltyModalOpen, setIsLoyaltyModalOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const toggleSearch = () => {
@@ -95,6 +97,35 @@ function MenuMainContent() {
           isSearchOpen={isSearchOpen}
           onToggleSearch={toggleSearch}
         />
+
+        {/* Loyalty Stamp Card Floating Banner / Button */}
+        {!isSearching && (
+          <div className="px-3.5 sm:px-4 pt-2 pb-1 animate-in fade-in duration-300">
+            <button
+              type="button"
+              onClick={() => setIsLoyaltyModalOpen(true)}
+              className="w-full p-2.5 sm:p-3 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/15 to-amber-500/10 hover:from-amber-500/15 hover:to-amber-500/20 border border-amber-500/30 text-foreground transition-all cursor-pointer flex items-center justify-between shadow-xs group"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform shrink-0">
+                  <Coffee className="h-4 w-4" />
+                </div>
+                <div className="flex flex-col text-left">
+                  <span className="text-[11px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-wider leading-none">
+                    Konteyner Kahve Kartı ☕
+                  </span>
+                  <span className="text-xs font-bold text-foreground mt-0.5">
+                    Damgalarını biriktir, hediye kahveni kap!
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 text-[11px] font-extrabold text-amber-700 dark:text-amber-300 bg-amber-500/15 px-2.5 py-1 rounded-xl">
+                <span>Kartı Aç</span>
+                <Sparkles className="h-3 w-3" />
+              </div>
+            </button>
+          </div>
+        )}
 
         {/* Search Bar Input Overlay */}
         {isSearchOpen && (
@@ -203,6 +234,12 @@ function MenuMainContent() {
           product={selectedProduct}
           isOpen={!!selectedProduct}
           onClose={() => setSelectedProduct(null)}
+        />
+
+        {/* Loyalty Stamp Card Modal */}
+        <LoyaltyStampCardModal
+          isOpen={isLoyaltyModalOpen}
+          onClose={() => setIsLoyaltyModalOpen(false)}
         />
       </div>
     </>

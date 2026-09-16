@@ -1,0 +1,97 @@
+import { NextRequest, NextResponse } from "next/server"
+import {
+  getCustomerById,
+  findCustomer,
+  registerCustomer
+} from "@/lib/data/loyalty-store"
+import { verifyStaffSession } from "@/lib/security/auth-guard"
+
+// GET: Retrieve customer by id, or search customers (search requires staff auth)
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get("id")
+    const q = searchParams.get("q")
+
+    // 1. Direct fetch by ID (Used by customer's phone when loading own card)
+    if (id) {
+      const customer = await getCustomerById(id)
+      if (!customer) {
+        return NextResponse.json({ error: "Müşteri bulunamadı." }, { status: 404 })
+      }
+      return NextResponse.json({ customer })
+    }
+
+    // 2. Search query (Phone, Code, Name - Staff Panel)
+    if (q) {
+      const auth = verifyStaffSession(request)
+      if (!auth.authenticated) {
+        return NextResponse.json(
+          { error: "Arama yapmak için personel girişi gereklidir." },
+          { status: 401 }
+        )
+      }
+
+      const results = await findCustomer(q)
+      return NextResponse.json({ customers: results })
+    }
+
+    return NextResponse.json(
+      { error: "Lütfen 'id' veya 'q' parametresi belirtiniz." },
+      { status: 400 }
+    )
+  } catch (error) {
+    console.error("Loyalty customer GET error:", error)
+    return NextResponse.json(
+      { error: "Müşteri bilgileri alınırken bir hata oluştu." },
+      { status: 500 }
+    )
+  }
+}
+
+// POST: Register or sign-in customer with Name, Phone & KVKK consent
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json().catch(() => null)
+    if (!body) {
+      return NextResponse.json(
+        { error: "Geçersiz istek gövdesi." },
+        { status: 400 }
+      )
+    }
+
+    const { fullName, phone, kvkkConsent } = body
+
+    if (!fullName || typeof fullName !== "string" || !fullName.trim()) {
+      return NextResponse.json(
+        { error: "Lütfen ad ve soyadınızı giriniz." },
+        { status: 400 }
+      )
+    }
+
+    if (!phone || typeof phone !== "string") {
+      return NextResponse.json(
+        { error: "Lütfen geçerli bir telefon numarası giriniz." },
+        { status: 400 }
+      )
+    }
+
+    if (kvkkConsent !== true) {
+      return NextResponse.json(
+        { error: "Sadakat kartı oluşturmak için lütfen KVKK Aydınlatma Metni'ni onaylayınız." },
+        { status: 400 }
+      )
+    }
+
+    const customer = await registerCustomer(fullName, phone, kvkkConsent)
+    return NextResponse.json({
+      success: true,
+      customer,
+      message: "Sadakat kartınız başarıyla hazırlandı!"
+    })
+  } catch (error) {
+    console.error("Loyalty customer POST error:", error)
+    const errorMsg = error instanceof Error ? error.message : "Müşteri kartı oluşturulamadı."
+    return NextResponse.json({ error: errorMsg }, { status: 400 })
+  }
+}

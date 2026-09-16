@@ -99,7 +99,14 @@ flowchart TD
 * **Hazır Şablon İndirme:** Sıfırdan menü oluşturmak veya toplu düzenleme yapmak için tek tıkla indirilebilir örnek JSON şablonu.
 * **Atomik Kayıt & Çok Katmanlı Önbellek Yenileme:** Başarısız yüklemelerde otomatik rollback mekanizması ve menü güncellendiğinde anında bellek önbelleklerinin temizlenmesi.
 
-### 4. 🎨 Saf Monokrom & Modern Tasarım Dili
+### 4. ☕ Dijital Kahve Sadakat Programı ("Özelleştirilebilir Damga Kartı")
+* **Starbucks Tarzı Dijital Damga Kartı:** Müşterilerin cep telefonunda açılan, her içecek alışverişinde damga biriktirdiği interaktif fincan kartı.
+* **Dinamik Hedef Damga Sayısı:** Panelden garson veya yönetici tarafından serbestçe seçilebilir hedef (3 Alana 4. Bedava, 4 Alana 5. Bedava vb.).
+* **Özelleştirilebilir Ürün Kapsamı:** Tüm içecekler, seçili kahve kategorileri veya tekil ürünler bazında kampanya kapsamını panelden belirleme.
+* **Hızlı Müşteri Tanıma & Kod Sistemi:** Müşterilere özel `#KNT-xxxx` kodu ve telefon ile anında arama, tek tıkla `+1 Damga` basma, geri alma ve hediye kullandırma.
+* **KVKK Güvenli ve SMS'siz:** Ad Soyad ve Telefon ile cihaz hafızasında güvenli saklama; SMS bekleme zahmeti olmaksızın cihaz değişimlerinde hak koruma.
+
+### 5. 🎨 Saf Monokrom & Modern Tasarım Dili
 * **Gündüz Modu (Light):** Temiz beyaz zemin, derin siyah tipografi ve yüksek kontrastlı etkileşim elemanları.
 * **Gece Modu (Dark):** Saf siyah zemin, yumuşak gri kartlar ve göz yormayan monokrom renk paleti.
 * **Duyarlı (Responsive) Tasarım:** Mobil cihazlarda alt sayfa (bottom sheet) çekmecesi, masaüstünde ise genişletilmiş yatay kart modal mimarisi.

@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Konteyner Cafe & Roastery",
+    "subtitle": "Dijital QR Menü, Masa Sipariş & Barista Yönetim Sistemi Mimarisi",
+    "output": "konteyner-architecture.html"
+  },
+  "components": [
+    {
+      "id": "customer_qr",
+      "type": "external",
+      "label": "Müşteri Masası",
+      "sublabel": "Mobil Web / PWA",
+      "pos": [40, 180],
+      "size": [140, 60],
+      "tag": "QR Token"
+    },
+    {
+      "id": "staff_client",
+      "type": "external",
+      "label": "Barista Terminali",
+      "sublabel": "Yönetim & Sipariş Paneli",
+      "pos": [40, 390],
+      "size": [140, 60],
+      "tag": "PIN Session"
+    },
+    {
+      "id": "edge_gateway",
+      "type": "cloud",
+      "label": "Vercel Edge / CDN",
+      "sublabel": "Next.js 15 App Router",
+      "pos": [280, 285],
+      "size": [140, 60],
+      "brand": "vercel"
+    },
+    {
+      "id": "qr_printer",
+      "type": "backend",
+      "label": "QR & Kart Motoru",
+      "sublabel": "Termal Kart & SVG Çıktı",
+      "pos": [280, 480],
+      "size": [140, 60]
+    },
+    {
+      "id": "auth_service",
+      "type": "security",
+      "label": "Auth & PIN Guard",
+      "sublabel": "/api/auth & Cookie",
+      "pos": [520, 130],
+      "size": [140, 60],
+      "tag": "JWT / PIN"
+    },
+    {
+      "id": "menu_orders_api",
+      "type": "backend",
+      "label": "Order & Menu Engine",
+      "sublabel": "Server Actions & REST",
+      "pos": [520, 285],
+      "size": [140, 60],
+      "brand": "next-js"
+    },
+    {
+      "id": "sse_realtime",
+      "type": "messagebus",
+      "label": "SSE Realtime Stream",
+      "sublabel": "/api/events & Sipariş",
+      "pos": [520, 440],
+      "size": [140, 60]
+    },
+    {
+      "id": "redis_kv",
+      "type": "database",
+      "label": "Upstash Redis KV",
+      "sublabel": "Masa Durumu & Sepet",
+      "pos": [770, 200],
+      "size": [140, 60],
+      "brand": "redis",
+      "tag": "TTL Cache"
+    },
+    {
+      "id": "supabase_db",
+      "type": "database",
+      "label": "Supabase PostgreSQL",
+      "sublabel": "Menü & Sipariş Geçmişi",
+      "pos": [770, 370],
+      "size": [140, 60],
+      "brand": "supabase"
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Next.js 15 Fullstack Runtime (App Router / Edge / Node.js)",
+      "wraps": [
+        "edge_gateway",
+        "qr_printer",
+        "auth_service",
+        "menu_orders_api",
+        "sse_realtime"
+      ]
+    },
+    {
+      "kind": "security-group",
+      "label": "Veri & Durum Yönetimi Katmanı",
+      "wraps": [
+        "redis_kv",
+        "supabase_db"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "from": "customer_qr",
+      "to": "edge_gateway",
+      "label": "HTTPS (QR Tarama)",
+      "variant": "emphasis",
+      "labelDy": 16
+    },
+    {
+      "from": "staff_client",
+      "to": "edge_gateway",
+      "label": "HTTPS (Panel)",
+      "variant": "emphasis"
+    },
+    {
+      "from": "staff_client",
+      "to": "qr_printer",
+      "label": "QR Kart Bas",
+      "variant": "dashed"
+    },
+    {
+      "from": "edge_gateway",
+      "to": "auth_service",
+      "label": "PIN Doğrulama",
+      "variant": "security",
+      "fromSide": "top",
+      "toSide": "left"
+    },
+    {
+      "from": "edge_gateway",
+      "to": "menu_orders_api",
+      "label": "Sipariş & Menü"
+    },
+    {
+      "from": "menu_orders_api",
+      "to": "redis_kv",
+      "label": "Anlık Sepet",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "from": "menu_orders_api",
+      "to": "supabase_db",
+      "label": "Menü Verisi",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "from": "menu_orders_api",
+      "to": "sse_realtime",
+      "label": "Sipariş Bildirimi",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 24
+    },
+    {
+      "from": "sse_realtime",
+      "to": "edge_gateway",
+      "label": "Event Push",
+      "variant": "dashed",
+      "fromSide": "left",
+      "toSide": "bottom"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Müşteri Masası & QR Menü",
+      "items": [
+        "Masa bazlı dinamik QR kod ile doğrudan erişim",
+        "Gündüz ve gece modu monokrom tasarım uyumu",
+        "Porsiyon, not ve sepet yönetimi ile anında sipariş"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Barista & Cafe Operasyonu",
+      "items": [
+        "PIN korumalı personel girişi ve yetkilendirme",
+        "SSE ile canlı masa sipariş düşüşü ve sesli bildirim",
+        "Masa bazlı termal QR kartı ve PDF yazdırma motoru"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Altyapı & Veri Yönetimi",
+      "items": [
+        "Next.js 15 App Router ve Tailwind v4 monokrom UI",
+        "Upstash Redis ile süreli oturum ve hızlı durum saklama",
+        "Supabase PostgreSQL ile ürün, kategori ve sipariş arşivi"
+      ]
+    }
+  ]
+}

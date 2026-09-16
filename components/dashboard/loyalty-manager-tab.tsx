@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import {
   LoyaltyCampaignConfig,
   LoyaltyCustomer,
@@ -21,7 +21,9 @@ import {
   Loader2,
   Check,
   Layers,
-  RotateCcw
+  RotateCcw,
+  Users,
+  RefreshCw
 } from "lucide-react"
 
 interface LoyaltyManagerTabProps {
@@ -63,7 +65,28 @@ export function LoyaltyManagerTab({
   const [formProductIds, setFormProductIds] = useState<string[]>([])
   const [formIsActive, setFormIsActive] = useState(true)
 
-  // 1. Load Campaign Config cleanly in effect
+  // Registered Customers List State
+  const [allCustomers, setAllCustomers] = useState<LoyaltyCustomer[]>([])
+  const [isAllCustomersLoading, setIsAllCustomersLoading] = useState(false)
+
+  const loadAllCustomers = useCallback(async () => {
+    try {
+      setIsAllCustomersLoading(true)
+      const res = await fetch("/api/loyalty/customer", { cache: "no-store" })
+      if (res.ok) {
+        const data = await res.json()
+        if (Array.isArray(data.customers)) {
+          setAllCustomers(data.customers)
+        }
+      }
+    } catch (e) {
+      console.warn("All customers fetch error:", e)
+    } finally {
+      setIsAllCustomersLoading(false)
+    }
+  }, [])
+
+  // 1. Load Campaign Config & All Customers cleanly in effect
   useEffect(() => {
     let active = true
     fetch("/api/loyalty/config", { cache: "no-store" })
@@ -80,6 +103,15 @@ export function LoyaltyManagerTab({
         setFormIsActive(data.config.isActive !== false)
       })
       .catch((e) => console.error("Config fetch error:", e))
+
+    fetch("/api/loyalty/customer", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (active && Array.isArray(data.customers)) {
+          setAllCustomers(data.customers)
+        }
+      })
+      .catch((e) => console.warn("All customers fetch error:", e))
 
     return () => {
       active = false
@@ -138,6 +170,7 @@ export function LoyaltyManagerTab({
       setSearchResults((prev) =>
         prev.map((c) => (c.id === customerId ? data.customer : c))
       )
+      loadAllCustomers()
 
       // Broadcast update to customer's open browser
       try {
@@ -529,6 +562,111 @@ export function LoyaltyManagerTab({
               </p>
             </div>
           )}
+
+          {/* Registered Customers List (Simple, functional, unpretentious) */}
+          <div className="p-5 sm:p-6 rounded-3xl bg-card border border-border flex flex-col gap-4 shadow-sm">
+            <div className="flex items-center justify-between gap-3 pb-3 border-b border-border">
+              <div className="flex items-center gap-2.5">
+                <Users className="h-5 w-5 text-primary" />
+                <div>
+                  <h4 className="text-sm font-black font-heading text-foreground">
+                    Kayıtlı Müşteriler ({allCustomers.length})
+                  </h4>
+                  <p className="text-xs text-foreground/60">
+                    Sisteme kayıtlı tüm sadakat müşterileri
+                  </p>
+                </div>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={isAllCustomersLoading}
+                onClick={loadAllCustomers}
+                className="text-xs gap-1.5 cursor-pointer text-foreground/70 hover:text-foreground"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${isAllCustomersLoading ? "animate-spin" : ""}`} />
+                <span>Yenile</span>
+              </Button>
+            </div>
+
+            {allCustomers.length === 0 ? (
+              <div className="py-8 text-center text-xs text-foreground/50">
+                {isAllCustomersLoading ? "Yükleniyor..." : "Henüz kayıtlı müşteri bulunmuyor."}
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-border/80 text-foreground/60 font-semibold uppercase tracking-wider">
+                      <th className="py-2.5 px-3">Müşteri</th>
+                      <th className="py-2.5 px-3">Telefon</th>
+                      <th className="py-2.5 px-3">Kod</th>
+                      <th className="py-2.5 px-3 text-center">Damga</th>
+                      <th className="py-2.5 px-3 text-center">Hediye</th>
+                      <th className="py-2.5 px-3 text-right">İşlem</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/40">
+                    {allCustomers.map((cust) => {
+                      const isSelected = selectedCustomer?.id === cust.id
+                      return (
+                        <tr
+                          key={cust.id}
+                          className={`hover:bg-muted/50 transition-colors ${
+                            isSelected ? "bg-primary/5 font-semibold" : ""
+                          }`}
+                        >
+                          <td className="py-3 px-3">
+                            <span className="text-foreground font-medium">{cust.fullName}</span>
+                          </td>
+                          <td className="py-3 px-3 text-foreground/70 font-mono">
+                            {cust.phone}
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-muted text-foreground/80">
+                              #{cust.customerCode}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 text-center">
+                            <span className="inline-flex items-center gap-1 font-bold text-primary">
+                              <Coffee className="h-3 w-3" />
+                              {cust.currentStamps}/{config?.targetStamps || 4}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 text-center">
+                            {cust.freeCoffeesAvailable > 0 ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                                <Gift className="h-3 w-3" />
+                                {cust.freeCoffeesAvailable}
+                              </span>
+                            ) : (
+                              <span className="text-foreground/40 font-normal">-</span>
+                            )}
+                          </td>
+                          <td className="py-3 px-3 text-right">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant={isSelected ? "default" : "outline"}
+                              onClick={() => {
+                                setSelectedCustomer(cust)
+                                setSearchResults([])
+                                window.scrollTo({ top: 0, behavior: "smooth" })
+                              }}
+                              className="h-7 text-xs px-2.5 rounded-lg cursor-pointer"
+                            >
+                              {isSelected ? "Seçili" : "Kartı Aç"}
+                            </Button>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

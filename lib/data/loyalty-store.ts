@@ -197,6 +197,13 @@ export async function updateCampaignConfig(
   return updatedConfig
 }
 
+export async function getAllCustomers(): Promise<LoyaltyCustomer[]> {
+  const store = await getLoyaltyStore()
+  return [...store.customers].sort(
+    (a, b) => new Date(b.updatedAt || b.createdAt).getTime() - new Date(a.updatedAt || a.createdAt).getTime()
+  )
+}
+
 export async function getCustomerById(id: string): Promise<LoyaltyCustomer | null> {
   const store = await getLoyaltyStore()
   return store.customers.find((c) => c.id === id) || null

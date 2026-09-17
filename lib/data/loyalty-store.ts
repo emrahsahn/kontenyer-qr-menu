@@ -244,8 +244,10 @@ export async function registerCustomer(
   // Check if phone already registered
   const existing = store.customers.find((c) => c.phone === phone)
   if (existing) {
-    // Update name or consent timestamp if needed and return
-    existing.fullName = fullName.trim()
+    // Preserve existing customer's original registered name; do not overwrite with foreign input
+    if (!existing.fullName) {
+      existing.fullName = fullName.trim()
+    }
     existing.kvkkConsent = true
     existing.updatedAt = new Date().toISOString()
     await persistLoyaltyStore(store)
@@ -276,6 +278,42 @@ export async function registerCustomer(
   store.customers.unshift(newCustomer)
   await persistLoyaltyStore(store)
   return newCustomer
+}
+
+export async function updateCustomer(
+  customerId: string,
+  data: { fullName: string; phone: string }
+): Promise<LoyaltyCustomer> {
+  const store = await getLoyaltyStore()
+  const customer = store.customers.find((c) => c.id === customerId)
+  if (!customer) {
+    throw new Error("Müşteri bulunamadı.")
+  }
+
+  const cleanName = data.fullName.trim()
+  if (!cleanName) {
+    throw new Error("Lütfen geçerli bir ad soyad giriniz.")
+  }
+
+  const cleanPhone = normalizePhone(data.phone)
+  if (cleanPhone.length < 10) {
+    throw new Error("Lütfen geçerli bir telefon numarası giriniz (örn: 05xx xxx xx xx).")
+  }
+
+  // Check if another customer already has this phone number
+  const phoneConflict = store.customers.find(
+    (c) => c.id !== customerId && c.phone === cleanPhone
+  )
+  if (phoneConflict) {
+    throw new Error(`Bu telefon numarası zaten '${phoneConflict.fullName}' (#${phoneConflict.customerCode}) adına kayıtlıdır.`)
+  }
+
+  customer.fullName = cleanName
+  customer.phone = cleanPhone
+  customer.updatedAt = new Date().toISOString()
+
+  await persistLoyaltyStore(store)
+  return customer
 }
 
 export async function executeLoyaltyAction(
@@ -351,4 +389,181 @@ export async function executeLoyaltyAction(
 
   await persistLoyaltyStore(store)
   return { customer, log }
+}
+
+export async function deleteCustomer(customerId: string): Promise<boolean> {
+  const store = await getLoyaltyStore()
+  const initialCount = store.customers.length
+  store.customers = store.customers.filter((c) => c.id !== customerId)
+
+  if (store.customers.length === initialCount) {
+    return false
+  }
+
+  // KVKK compliance: clean up historical action logs for deleted customer
+  store.logs = store.logs.filter((l) => l.customerId !== customerId)
+
+  await persistLoyaltyStore(store)
+  return true
+}
+
+export interface LoyaltyBackupData {
+  version: "1.0"
+  exportedAt: string
+  campaign?: LoyaltyCampaignConfig
+  customers: LoyaltyCustomer[]
+  logsCount: number
+}
+
+export async function exportLoyaltyData(): Promise<LoyaltyBackupData> {
+  const store = await getLoyaltyStore()
+  return {
+    version: "1.0",
+    exportedAt: new Date().toISOString(),
+    campaign: store.config,
+    customers: store.customers,
+    logsCount: store.logs.length
+  }
+}
+
+export interface LoyaltyValidationResult {
+  valid: boolean
+  customerCount: number
+  errors: string[]
+  warnings: string[]
+  data?: LoyaltyBackupData
+}
+
+export function validateLoyaltyBackup(raw: unknown): LoyaltyValidationResult {
+  const errors: string[] = []
+  const warnings: string[] = []
+
+  if (!raw || typeof raw !== "object") {
+    return { valid: false, customerCount: 0, errors: ["Yüklenen veri geçerli bir JSON nesnesi değil."], warnings }
+  }
+
+  const obj = raw as Record<string, unknown>
+  let customersRaw: unknown[] = []
+
+  if (Array.isArray(obj.customers)) {
+    customersRaw = obj.customers
+  } else if (Array.isArray(raw)) {
+    customersRaw = raw
+  } else {
+    errors.push("'customers' müşteri listesi dizisi bulunamadı.")
+    return { valid: false, customerCount: 0, errors, warnings }
+  }
+
+  const validCustomers: LoyaltyCustomer[] = []
+  const seenPhones = new Set<string>()
+
+  for (let i = 0; i < customersRaw.length; i++) {
+    const item = customersRaw[i] as Record<string, unknown>
+    if (!item || typeof item !== "object") {
+      errors.push(`${i + 1}. sıradaki müşteri nesnesi geçersiz.`)
+      continue
+    }
+
+    if (!item.fullName || typeof item.fullName !== "string") {
+      errors.push(`${i + 1}. müşterinin adı (fullName) eksik.`)
+    }
+    if (!item.phone || typeof item.phone !== "string") {
+      errors.push(`${i + 1}. müşterinin telefon numarası eksik.`)
+    }
+
+    const phoneDigits = String(item.phone || "").replace(/\D/g, "")
+    if (phoneDigits.length < 10) {
+      warnings.push(`"${item.fullName || i + 1}" müşterisinin telefon numarası 10 haneden kısa görünüyor.`)
+    }
+
+    if (seenPhones.has(phoneDigits)) {
+      warnings.push(`Mükerrer telefon tespit edildi: ${phoneDigits}.`)
+    }
+    seenPhones.add(phoneDigits)
+
+    const normalizedPhone = phoneDigits.startsWith("0") ? phoneDigits : "0" + phoneDigits
+
+    const customer: LoyaltyCustomer = {
+      id: typeof item.id === "string" && item.id ? item.id : `cust_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      phone: normalizedPhone,
+      fullName: String(item.fullName || "İsimsiz Müşteri").trim(),
+      customerCode: typeof item.customerCode === "string" && item.customerCode ? item.customerCode : `KNT-${Math.floor(1000 + Math.random() * 9000)}`,
+      currentStamps: typeof item.currentStamps === "number" ? Math.max(0, item.currentStamps) : 0,
+      freeCoffeesAvailable: typeof item.freeCoffeesAvailable === "number" ? Math.max(0, item.freeCoffeesAvailable) : 0,
+      totalStampsEarned: typeof item.totalStampsEarned === "number" ? Math.max(0, item.totalStampsEarned) : 0,
+      totalFreeRedeemed: typeof item.totalFreeRedeemed === "number" ? Math.max(0, item.totalFreeRedeemed) : 0,
+      kvkkConsent: true,
+      kvkkConsentAt: typeof item.kvkkConsentAt === "string" ? item.kvkkConsentAt : new Date().toISOString(),
+      createdAt: typeof item.createdAt === "string" ? item.createdAt : new Date().toISOString(),
+      updatedAt: typeof item.updatedAt === "string" ? item.updatedAt : new Date().toISOString()
+    }
+
+    validCustomers.push(customer)
+  }
+
+  if (errors.length > 0) {
+    return { valid: false, customerCount: validCustomers.length, errors, warnings }
+  }
+
+  const campaign =
+    obj.campaign && typeof obj.campaign === "object"
+      ? (obj.campaign as LoyaltyCampaignConfig)
+      : undefined
+
+  return {
+    valid: true,
+    customerCount: validCustomers.length,
+    errors: [],
+    warnings,
+    data: {
+      version: "1.0",
+      exportedAt: new Date().toISOString(),
+      campaign,
+      customers: validCustomers,
+      logsCount: 0
+    }
+  }
+}
+
+export async function importLoyaltyData(
+  backupData: LoyaltyBackupData,
+  mode: "merge" | "replace" = "merge"
+): Promise<{ customersCount: number }> {
+  const store = await getLoyaltyStore()
+
+  if (backupData.campaign && typeof backupData.campaign === "object") {
+    if (backupData.campaign.targetStamps) {
+      store.config = {
+        ...store.config,
+        ...backupData.campaign,
+        updatedAt: new Date().toISOString()
+      }
+    }
+  }
+
+  if (mode === "replace") {
+    store.customers = backupData.customers
+  } else {
+    const map = new Map<string, LoyaltyCustomer>()
+    for (const c of store.customers) {
+      map.set(c.phone, c)
+    }
+    for (const incoming of backupData.customers) {
+      const existing = map.get(incoming.phone)
+      if (existing) {
+        existing.fullName = incoming.fullName || existing.fullName
+        existing.currentStamps = incoming.currentStamps
+        existing.freeCoffeesAvailable = incoming.freeCoffeesAvailable
+        existing.totalStampsEarned = Math.max(existing.totalStampsEarned, incoming.totalStampsEarned)
+        existing.totalFreeRedeemed = Math.max(existing.totalFreeRedeemed, incoming.totalFreeRedeemed)
+        existing.updatedAt = new Date().toISOString()
+      } else {
+        map.set(incoming.phone, incoming)
+      }
+    }
+    store.customers = Array.from(map.values())
+  }
+
+  await persistLoyaltyStore(store)
+  return { customersCount: store.customers.length }
 }

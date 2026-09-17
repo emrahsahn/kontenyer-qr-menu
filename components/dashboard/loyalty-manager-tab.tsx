@@ -23,8 +23,14 @@ import {
   Layers,
   RotateCcw,
   Users,
-  RefreshCw
+  RefreshCw,
+  Trash2,
+  Database,
+  Pencil
 } from "lucide-react"
+import { LoyaltyDeleteConfirmModal } from "./loyalty-delete-confirm-modal"
+import { LoyaltyBackupModal } from "./loyalty-backup-modal"
+import { LoyaltyEditCustomerModal } from "./loyalty-edit-customer-modal"
 
 interface LoyaltyManagerTabProps {
   categories: Category[]
@@ -85,6 +91,48 @@ export function LoyaltyManagerTab({
       setIsAllCustomersLoading(false)
     }
   }, [])
+
+  // Delete Customer State & Handler
+  const [customerToDelete, setCustomerToDelete] = useState<LoyaltyCustomer | null>(null)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isDeletingCustomer, setIsDeletingCustomer] = useState(false)
+
+  // Edit Customer State
+  const [customerToEdit, setCustomerToEdit] = useState<LoyaltyCustomer | null>(null)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+
+  // Backup & Import Modal State
+  const [isBackupModalOpen, setIsBackupModalOpen] = useState(false)
+
+  const handleDeleteCustomer = async (customerId: string) => {
+    try {
+      setIsDeletingCustomer(true)
+      const res = await fetch(`/api/loyalty/customer?id=${encodeURIComponent(customerId)}`, {
+        method: "DELETE"
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        throw new Error(data.error || "Müşteri silinemedi.")
+      }
+
+      onShowToast("Müşteri kaydı ve damgaları başarıyla silindi.")
+      setIsDeleteDialogOpen(false)
+      setCustomerToDelete(null)
+
+      // If active customer was deleted, clear active view
+      if (selectedCustomer?.id === customerId) {
+        setSelectedCustomer(null)
+      }
+
+      await loadAllCustomers()
+    } catch (err) {
+      console.error("Delete customer error:", err)
+      const msg = err instanceof Error ? err.message : "Silme işlemi sırasında hata oluştu."
+      onShowToast(msg)
+    } finally {
+      setIsDeletingCustomer(false)
+    }
+  }
 
   // 1. Load Campaign Config & All Customers cleanly in effect
   useEffect(() => {
@@ -208,12 +256,17 @@ export function LoyaltyManagerTab({
         throw new Error(data.error || "Müşteri kaydedilemedi.")
       }
 
-      onShowToast(`"${data.customer.fullName}" için sadakat kartı oluşturuldu! Kod: ${data.customer.customerCode}`)
+      if (data.customer.fullName.toLowerCase() !== newCustName.trim().toLowerCase()) {
+        onShowToast(`Bu numara zaten "${data.customer.fullName}" (#${data.customer.customerCode}) adına kayıtlı. Mevcut kart açıldı.`)
+      } else {
+        onShowToast(`"${data.customer.fullName}" için sadakat kartı oluşturuldu! Kod: ${data.customer.customerCode}`)
+      }
       setSelectedCustomer(data.customer)
       setSearchResults([data.customer])
       setIsQuickRegisterOpen(false)
       setNewCustName("")
       setNewCustPhone("")
+      loadAllCustomers()
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Müşteri kaydı yapılamadı."
       alert(msg)
@@ -545,7 +598,22 @@ export function LoyaltyManagerTab({
                   <span>Toplam Kazanılan: <strong className="text-foreground">{selectedCustomer.totalStampsEarned} Damga</strong></span>
                   <span>Toplam Kullanılan: <strong className="text-foreground">{selectedCustomer.totalFreeRedeemed} Hediye</strong></span>
                 </div>
-                <span>Son Güncelleme: {new Date(selectedCustomer.updatedAt).toLocaleTimeString("tr-TR")}</span>
+                <div className="flex items-center gap-3">
+                  <span>Son Güncelleme: {new Date(selectedCustomer.updatedAt).toLocaleTimeString("tr-TR")}</span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setCustomerToEdit(selectedCustomer)
+                      setIsEditDialogOpen(true)
+                    }}
+                    className="h-7 text-xs px-2.5 rounded-lg gap-1.5 cursor-pointer border-border hover:bg-muted"
+                  >
+                    <Pencil className="h-3 w-3 text-primary" />
+                    <span>Bilgileri Düzenle</span>
+                  </Button>
+                </div>
               </div>
             </div>
           ) : (
@@ -577,17 +645,30 @@ export function LoyaltyManagerTab({
                   </p>
                 </div>
               </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                disabled={isAllCustomersLoading}
-                onClick={loadAllCustomers}
-                className="text-xs gap-1.5 cursor-pointer text-foreground/70 hover:text-foreground"
-              >
-                <RefreshCw className={`h-3.5 w-3.5 ${isAllCustomersLoading ? "animate-spin" : ""}`} />
-                <span>Yenile</span>
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsBackupModalOpen(true)}
+                  className="text-xs gap-1.5 cursor-pointer rounded-xl border-border hover:bg-muted/80"
+                  title="Sadakat Verilerini Yedekle veya Geri Yükle"
+                >
+                  <Database className="h-3.5 w-3.5 text-primary" />
+                  <span className="hidden sm:inline">Yedekle / Aktar</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={isAllCustomersLoading}
+                  onClick={loadAllCustomers}
+                  className="text-xs gap-1.5 cursor-pointer text-foreground/70 hover:text-foreground"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 ${isAllCustomersLoading ? "animate-spin" : ""}`} />
+                  <span className="hidden sm:inline">Yenile</span>
+                </Button>
+              </div>
             </div>
 
             {allCustomers.length === 0 ? (
@@ -645,19 +726,49 @@ export function LoyaltyManagerTab({
                             )}
                           </td>
                           <td className="py-3 px-3 text-right">
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant={isSelected ? "default" : "outline"}
-                              onClick={() => {
-                                setSelectedCustomer(cust)
-                                setSearchResults([])
-                                window.scrollTo({ top: 0, behavior: "smooth" })
-                              }}
-                              className="h-7 text-xs px-2.5 rounded-lg cursor-pointer"
-                            >
-                              {isSelected ? "Seçili" : "Kartı Aç"}
-                            </Button>
+                            <div className="flex items-center justify-end gap-1.5">
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant={isSelected ? "default" : "outline"}
+                                onClick={() => {
+                                  setSelectedCustomer(cust)
+                                  setSearchResults([])
+                                  window.scrollTo({ top: 0, behavior: "smooth" })
+                                }}
+                                className="h-7 text-xs px-2.5 rounded-lg cursor-pointer"
+                              >
+                                {isSelected ? "Seçili" : "Kartı Aç"}
+                              </Button>
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="ghost"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setCustomerToEdit(cust)
+                                  setIsEditDialogOpen(true)
+                                }}
+                                className="h-7 w-7 p-0 rounded-lg text-foreground/40 hover:text-primary hover:bg-primary/10 cursor-pointer"
+                                title="Müşteri Bilgilerini Düzenle"
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="ghost"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setCustomerToDelete(cust)
+                                  setIsDeleteDialogOpen(true)
+                                }}
+                                className="h-7 w-7 p-0 rounded-lg text-foreground/40 hover:text-destructive hover:bg-destructive/10 cursor-pointer"
+                                title="Müşteriyi Sil"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       )
@@ -886,6 +997,47 @@ export function LoyaltyManagerTab({
           </div>
         </form>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <LoyaltyDeleteConfirmModal
+        customer={customerToDelete}
+        isOpen={isDeleteDialogOpen}
+        onClose={() => {
+          if (!isDeletingCustomer) {
+            setIsDeleteDialogOpen(false)
+            setCustomerToDelete(null)
+          }
+        }}
+        onConfirm={handleDeleteCustomer}
+        isDeleting={isDeletingCustomer}
+      />
+
+      {/* Edit Customer Modal */}
+      <LoyaltyEditCustomerModal
+        customer={customerToEdit}
+        isOpen={isEditDialogOpen}
+        onClose={() => {
+          setIsEditDialogOpen(false)
+          setCustomerToEdit(null)
+        }}
+        onSuccess={(updated) => {
+          if (selectedCustomer?.id === updated.id) {
+            setSelectedCustomer(updated)
+          }
+          loadAllCustomers()
+        }}
+        onShowToast={onShowToast}
+      />
+
+      {/* Backup / Export / Import Modal */}
+      <LoyaltyBackupModal
+        isOpen={isBackupModalOpen}
+        onClose={() => setIsBackupModalOpen(false)}
+        totalCustomers={allCustomers.length}
+        customers={allCustomers}
+        onImportSuccess={loadAllCustomers}
+        onShowToast={onShowToast}
+      />
     </div>
   )
 }

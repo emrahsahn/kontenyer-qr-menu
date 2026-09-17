@@ -3,7 +3,9 @@ import {
   getCustomerById,
   findCustomer,
   registerCustomer,
-  getAllCustomers
+  getAllCustomers,
+  deleteCustomer,
+  updateCustomer
 } from "@/lib/data/loyalty-store"
 import { verifyStaffSession } from "@/lib/security/auth-guard"
 
@@ -100,6 +102,95 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Loyalty customer POST error:", error)
     const errorMsg = error instanceof Error ? error.message : "Müşteri kartı oluşturulamadı."
+    return NextResponse.json({ error: errorMsg }, { status: 400 })
+  }
+}
+
+// DELETE: Remove customer (Staff only)
+export async function DELETE(request: NextRequest) {
+  try {
+    const auth = verifyStaffSession(request)
+    if (!auth.authenticated) {
+      return NextResponse.json(
+        { error: "Müşteri silmek için personel girişi gereklidir." },
+        { status: 401 }
+      )
+    }
+
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get("id")
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Silinecek müşteri ID'si belirtilmedi." },
+        { status: 400 }
+      )
+    }
+
+    const deleted = await deleteCustomer(id)
+    if (!deleted) {
+      return NextResponse.json(
+        { error: "Silinecek müşteri bulunamadı." },
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Müşteri kaydı ve verileri başarıyla silindi."
+    })
+  } catch (error) {
+    console.error("Loyalty customer DELETE error:", error)
+    return NextResponse.json(
+      { error: "Müşteri silinirken bir hata meydana geldi." },
+      { status: 500 }
+    )
+  }
+}
+
+// PUT: Update customer details (Name & Phone - Staff only)
+export async function PUT(request: NextRequest) {
+  try {
+    const auth = verifyStaffSession(request)
+    if (!auth.authenticated) {
+      return NextResponse.json(
+        { error: "Müşteri bilgilerini güncellemek için personel girişi gereklidir." },
+        { status: 401 }
+      )
+    }
+
+    const body = await request.json().catch(() => null)
+    if (!body || !body.id) {
+      return NextResponse.json(
+        { error: "Güncellenecek müşteri ID'si belirtilmedi." },
+        { status: 400 }
+      )
+    }
+
+    const { id, fullName, phone } = body
+    if (!fullName || typeof fullName !== "string" || !fullName.trim()) {
+      return NextResponse.json(
+        { error: "Lütfen geçerli bir ad soyad giriniz." },
+        { status: 400 }
+      )
+    }
+
+    if (!phone || typeof phone !== "string") {
+      return NextResponse.json(
+        { error: "Lütfen geçerli bir telefon numarası giriniz." },
+        { status: 400 }
+      )
+    }
+
+    const updated = await updateCustomer(id, { fullName, phone })
+    return NextResponse.json({
+      success: true,
+      customer: updated,
+      message: "Müşteri bilgileri başarıyla güncellendi."
+    })
+  } catch (error) {
+    console.error("Loyalty customer PUT error:", error)
+    const errorMsg = error instanceof Error ? error.message : "Müşteri güncellenirken bir hata oluştu."
     return NextResponse.json({ error: errorMsg }, { status: 400 })
   }
 }

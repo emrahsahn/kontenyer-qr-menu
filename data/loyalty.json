@@ -9,64 +9,56 @@
     "productIds": [],
     "rewardTitle": "1 Adet Ücretsiz Kahve",
     "isActive": true,
-    "updatedAt": "2026-09-17T00:00:00.000Z"
+    "updatedAt": "2026-09-16T22:17:22.084Z"
   },
   "customers": [
     {
-      "id": "cust_1789594030668_ht65j",
-      "phone": "05380874885",
-      "fullName": "emrah",
-      "customerCode": "KNT-7012",
+      "id": "cust_1789660762737_pq0s8",
+      "phone": "05551112233",
+      "fullName": "Test MTest Musteri",
+      "customerCode": "KNT-7460",
       "currentStamps": 0,
       "freeCoffeesAvailable": 0,
-      "totalStampsEarned": 4,
-      "totalFreeRedeemed": 1,
+      "totalStampsEarned": 0,
+      "totalFreeRedeemed": 0,
       "kvkkConsent": true,
-      "kvkkConsentAt": "2026-09-16T21:27:10.669Z",
-      "createdAt": "2026-09-16T21:27:10.669Z",
-      "updatedAt": "2026-09-16T22:01:26.213Z"
+      "kvkkConsentAt": "2026-09-17T15:59:22.738Z",
+      "createdAt": "2026-09-17T15:59:22.738Z",
+      "updatedAt": "2026-09-17T15:59:22.738Z"
+    },
+    {
+      "id": "cust_1789659824352_5qtvq",
+      "phone": "05449876543",
+      "fullName": "Ahmet Demir",
+      "customerCode": "KNT-6762",
+      "currentStamps": 0,
+      "freeCoffeesAvailable": 0,
+      "totalStampsEarned": 0,
+      "totalFreeRedeemed": 0,
+      "kvkkConsent": true,
+      "kvkkConsentAt": "2026-09-17T15:43:44.352Z",
+      "createdAt": "2026-09-17T15:43:44.352Z",
+      "updatedAt": "2026-09-17T15:43:44.352Z"
+    },
+    {
+      "id": "cust_1789659335144_uteyh",
+      "phone": "05380874885",
+      "fullName": "ahmet",
+      "customerCode": "KNT-5241",
+      "currentStamps": 2,
+      "freeCoffeesAvailable": 0,
+      "totalStampsEarned": 2,
+      "totalFreeRedeemed": 0,
+      "kvkkConsent": true,
+      "kvkkConsentAt": "2026-09-17T15:35:35.144Z",
+      "createdAt": "2026-09-17T15:35:35.144Z",
+      "updatedAt": "2026-09-17T16:07:53.729Z"
     }
   ],
   "logs": [
     {
-      "id": "log_1789596086213_ji06",
-      "customerId": "cust_1789594030668_ht65j",
-      "action": "REDEEM_FREE",
-      "amount": 1,
-      "previousStamps": 0,
-      "newStamps": 0,
-      "previousFree": 1,
-      "newFree": 0,
-      "staffUsername": "yali_yonetim",
-      "createdAt": "2026-09-16T22:01:26.213Z"
-    },
-    {
-      "id": "log_1789596084214_31ke",
-      "customerId": "cust_1789594030668_ht65j",
-      "action": "STAMP_ADD",
-      "amount": 1,
-      "previousStamps": 3,
-      "newStamps": 0,
-      "previousFree": 0,
-      "newFree": 1,
-      "staffUsername": "yali_yonetim",
-      "createdAt": "2026-09-16T22:01:24.214Z"
-    },
-    {
-      "id": "log_1789596042730_peey",
-      "customerId": "cust_1789594030668_ht65j",
-      "action": "STAMP_ADD",
-      "amount": 1,
-      "previousStamps": 2,
-      "newStamps": 3,
-      "previousFree": 0,
-      "newFree": 0,
-      "staffUsername": "yali_yonetim",
-      "createdAt": "2026-09-16T22:00:42.730Z"
-    },
-    {
-      "id": "log_1789594105237_wcjc",
-      "customerId": "cust_1789594030668_ht65j",
+      "id": "log_1789659338587_cz53",
+      "customerId": "cust_1789659335144_uteyh",
       "action": "STAMP_ADD",
       "amount": 1,
       "previousStamps": 1,
@@ -74,11 +66,11 @@
       "previousFree": 0,
       "newFree": 0,
       "staffUsername": "yali_yonetim",
-      "createdAt": "2026-09-16T21:28:25.237Z"
+      "createdAt": "2026-09-17T15:35:38.588Z"
     },
     {
-      "id": "log_1789594097986_f4mf",
-      "customerId": "cust_1789594030668_ht65j",
+      "id": "log_1789659337526_cjj0",
+      "customerId": "cust_1789659335144_uteyh",
       "action": "STAMP_ADD",
       "amount": 1,
       "previousStamps": 0,
@@ -86,7 +78,7 @@
       "previousFree": 0,
       "newFree": 0,
       "staffUsername": "yali_yonetim",
-      "createdAt": "2026-09-16T21:28:17.986Z"
+      "createdAt": "2026-09-17T15:35:37.526Z"
     }
   ]
 }

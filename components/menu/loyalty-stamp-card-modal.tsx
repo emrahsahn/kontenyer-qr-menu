@@ -20,7 +20,10 @@ import {
   Info,
   ChevronRight,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  CheckCircle2,
+  ArrowLeft,
+  LogOut
 } from "lucide-react"
 
 interface LoyaltyStampCardModalProps {
@@ -35,6 +38,11 @@ export function LoyaltyStampCardModal({ isOpen, onClose }: LoyaltyStampCardModal
   const [customer, setCustomer] = useState<LoyaltyCustomer | null>(() => {
     if (typeof window === "undefined") return null
     try {
+      const urlParams = new URLSearchParams(window.location.search)
+      if (urlParams.has("reset_card")) {
+        localStorage.removeItem(LOCAL_STORAGE_KEY)
+        return null
+      }
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY)
       if (saved) {
         const parsed = JSON.parse(saved) as LoyaltyCustomer
@@ -51,10 +59,12 @@ export function LoyaltyStampCardModal({ isOpen, onClose }: LoyaltyStampCardModal
   const [kvkkConsent, setKvkkConsent] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+  const [regStep, setRegStep] = useState<"input" | "confirm">("input")
 
   // Sub-modals
   const [isKvkkModalOpen, setIsKvkkModalOpen] = useState(false)
   const [isScopeModalOpen, setIsScopeModalOpen] = useState(false)
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false)
   const [copiedCode, setCopiedCode] = useState(false)
 
   // 1. Manual or Broadcast Refresh
@@ -127,9 +137,31 @@ export function LoyaltyStampCardModal({ isOpen, onClose }: LoyaltyStampCardModal
     }
   }, [customer?.id, handleManualRefresh])
 
-  // Handle Customer Registration
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault()
+  // Step 1: Proceed to Confirmation Screen
+  const handleProceedToConfirm = (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+    setFormError(null)
+
+    if (!fullName.trim()) {
+      setFormError("Lütfen ad ve soyadınızı giriniz.")
+      return
+    }
+    const cleanDigits = phone.replace(/\D/g, "")
+    if (cleanDigits.length < 10) {
+      setFormError("Lütfen geçerli bir telefon numarası giriniz (örn: 05xx xxx xx xx).")
+      return
+    }
+    if (!kvkkConsent) {
+      setFormError("Sadakat kartı oluşturmak için KVKK Aydınlatma Metni'ni onaylamanız gerekmektedir.")
+      return
+    }
+
+    setRegStep("confirm")
+  }
+
+  // Step 2: Final Registration Execution
+  const handleRegister = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
     setFormError(null)
 
     if (!fullName.trim()) {
@@ -177,6 +209,19 @@ export function LoyaltyStampCardModal({ isOpen, onClose }: LoyaltyStampCardModal
     navigator.clipboard.writeText(customer.customerCode)
     setCopiedCode(true)
     setTimeout(() => setCopiedCode(false), 2000)
+  }
+
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_KEY)
+    } catch {}
+    setCustomer(null)
+    setFullName("")
+    setPhone("")
+    setKvkkConsent(false)
+    setRegStep("input")
+    setFormError(null)
+    setIsLogoutConfirmOpen(false)
   }
 
   const targetStamps = config?.targetStamps || 4
@@ -228,98 +273,166 @@ export function LoyaltyStampCardModal({ isOpen, onClose }: LoyaltyStampCardModal
               </div>
             ) : !customer ? (
               /* =======================================
-                 1. REGISTRATION FORM (NEW CUSTOMER)
+                 1. REGISTRATION (2-STEP WITH CONFIRMATION)
                  ======================================= */
-              <form onSubmit={handleRegister} className="flex flex-col gap-4">
-                <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/15 flex items-start gap-3">
-                  <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 shrink-0">
-                    <Gift className="h-5 w-5" />
+              regStep === "input" ? (
+                /* Step 1: Input Form */
+                <form onSubmit={handleProceedToConfirm} className="flex flex-col gap-4">
+                  <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/15 flex items-start gap-3">
+                    <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 shrink-0">
+                      <Gift className="h-5 w-5" />
+                    </div>
+                    <div className="text-xs text-foreground/80 leading-relaxed font-medium">
+                      <strong className="text-foreground font-extrabold block mb-0.5">
+                        {targetStamps} Kahve Alana Bir Sonraki Hediye!
+                      </strong>
+                      Telefon numaranızla anında kartınızı oluşturun, her siparişte garsonunuza kodunuzu söyleyerek damga kazanın.
+                    </div>
                   </div>
-                  <div className="text-xs text-foreground/80 leading-relaxed font-medium">
-                    <strong className="text-foreground font-extrabold block mb-0.5">
-                      {targetStamps} Kahve Alana Bir Sonraki Hediye!
-                    </strong>
-                    Telefon numaranızla anında kartınızı oluşturun, her siparişte garsonunuza kodunuzu söyleyerek damga kazanın.
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-foreground/80">Adınız ve Soyadınız</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Örn: Emrah Şahin"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="w-full px-4 py-3 rounded-2xl border border-border bg-background text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    />
                   </div>
-                </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-foreground/80">Adınız ve Soyadınız</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Örn: Emrah Şahin"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="w-full px-4 py-3 rounded-2xl border border-border bg-background text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-foreground/80">Cep Telefonu Numaranız</label>
-                  <input
-                    type="tel"
-                    required
-                    placeholder="05xx xxx xx xx"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full px-4 py-3 rounded-2xl border border-border bg-background text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  />
-                  <span className="text-[10px] text-foreground/50 font-medium">
-                    * SMS şifresi beklemenize gerek yoktur. Cihaz değiştirseniz dahi telefon numaranızla haklarınız korunur.
-                  </span>
-                </div>
-
-                {/* KVKK Consent Checkbox */}
-                <div className="p-3 rounded-2xl border border-border bg-muted/30 flex items-start gap-2.5">
-                  <input
-                    type="checkbox"
-                    id="kvkk-consent"
-                    checked={kvkkConsent}
-                    onChange={(e) => setKvkkConsent(e.target.checked)}
-                    className="mt-1 h-4 w-4 rounded accent-primary cursor-pointer"
-                  />
-                  <label htmlFor="kvkk-consent" className="text-[11px] text-foreground/75 leading-snug cursor-pointer">
-                    Konteyner Cafe & Roastery Sadakat Programı kapsamında kişisel verilerimin işlenmesine ilişkin{" "}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setIsKvkkModalOpen(true)
-                      }}
-                      className="underline font-bold text-primary hover:text-primary/80 inline"
-                    >
-                      KVKK Aydınlatma Metni&apos;ni
-                    </button>{" "}
-                    okudum ve kabul ediyorum.
-                  </label>
-                </div>
-
-                {formError && (
-                  <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs font-semibold flex items-center gap-2">
-                    <Info className="h-4 w-4 shrink-0" />
-                    <span>{formError}</span>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-foreground/80">Cep Telefonu Numaranız</label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="05xx xxx xx xx"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full px-4 py-3 rounded-2xl border border-border bg-background text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    />
+                    <span className="text-[10px] text-foreground/50 font-medium">
+                      * SMS şifresi beklemenize gerek yoktur. Cihaz değiştirseniz dahi telefon numaranızla haklarınız korunur.
+                    </span>
                   </div>
-                )}
 
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-6 rounded-2xl font-heading font-black text-sm bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 transition-all cursor-pointer mt-1"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      <span>Kartınız Hazırlanıyor...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Coffee className="h-4 w-4 mr-2" />
-                      <span>Kartımı Oluştur ve Başla</span>
-                    </>
+                  {/* KVKK Consent Checkbox */}
+                  <div className="p-3 rounded-2xl border border-border bg-muted/30 flex items-start gap-2.5">
+                    <input
+                      type="checkbox"
+                      id="kvkk-consent"
+                      checked={kvkkConsent}
+                      onChange={(e) => setKvkkConsent(e.target.checked)}
+                      className="mt-1 h-4 w-4 rounded accent-primary cursor-pointer"
+                    />
+                    <label htmlFor="kvkk-consent" className="text-[11px] text-foreground/75 leading-snug cursor-pointer">
+                      Konteyner Cafe & Roastery Sadakat Programı kapsamında kişisel verilerimin işlenmesine ilişkin{" "}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setIsKvkkModalOpen(true)
+                        }}
+                        className="underline font-bold text-primary hover:text-primary/80 inline"
+                      >
+                        KVKK Aydınlatma Metni&apos;ni
+                      </button>{" "}
+                      okudum ve kabul ediyorum.
+                    </label>
+                  </div>
+
+                  {formError && (
+                    <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs font-semibold flex items-center gap-2">
+                      <Info className="h-4 w-4 shrink-0" />
+                      <span>{formError}</span>
+                    </div>
                   )}
-                </Button>
-              </form>
+
+                  <Button
+                    type="submit"
+                    className="w-full py-6 rounded-2xl font-heading font-black text-sm bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 transition-all cursor-pointer mt-1 flex items-center justify-center gap-2"
+                  >
+                    <span>Devam Et (Bilgileri Kontrol Et)</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </form>
+              ) : (
+                /* Step 2: Confirmation Screen (Prevents Typos) */
+                <div className="flex flex-col gap-4 animate-in fade-in-50 duration-200">
+                  <div className="p-4 rounded-2xl bg-primary/5 border border-primary/20 flex flex-col gap-3 text-center items-center">
+                    <div className="p-3 rounded-2xl bg-primary/10 text-primary border border-primary/20">
+                      <CheckCircle2 className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-black font-heading text-foreground">
+                        Girdiğiniz Bilgileri Onaylayın
+                      </h4>
+                      <p className="text-xs text-foreground/60 mt-0.5">
+                        Damgalarınızın kaybolmaması için telefon numaranızın doğruluğunu kontrol ediniz.
+                      </p>
+                    </div>
+
+                    {/* Big Customer Info Card */}
+                    <div className="w-full p-4 rounded-2xl bg-card border border-border flex flex-col gap-2.5 text-left shadow-xs">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-foreground/50 font-bold uppercase tracking-wider">Ad Soyad</span>
+                        <span className="text-sm font-bold text-foreground">{fullName.trim()}</span>
+                      </div>
+                      <div className="h-px w-full bg-border/60" />
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-foreground/50 font-bold uppercase tracking-wider">Telefon Numarası</span>
+                        <span className="text-base font-black font-mono text-primary tracking-wide">{phone.trim()}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-2.5 text-xs text-amber-800 dark:text-amber-300 font-medium">
+                    <Sparkles className="h-4 w-4 shrink-0 mt-0.5" />
+                    <span>Sadakat kartınız bu telefon numarasına bağlanacaktır. Damgalarınız bu numara üzerinden birikir.</span>
+                  </div>
+
+                  {formError && (
+                    <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs font-semibold flex items-center gap-2">
+                      <Info className="h-4 w-4 shrink-0" />
+                      <span>{formError}</span>
+                    </div>
+                  )}
+
+                  {/* Back or Confirm & Start Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={isSubmitting}
+                      onClick={() => setRegStep("input")}
+                      className="w-full sm:w-2/5 py-5 rounded-2xl cursor-pointer font-bold text-xs flex items-center justify-center gap-1.5"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                      <span>Düzelt</span>
+                    </Button>
+
+                    <Button
+                      type="button"
+                      disabled={isSubmitting}
+                      onClick={() => handleRegister()}
+                      className="w-full sm:w-3/5 py-5 rounded-2xl font-heading font-black text-xs sm:text-sm bg-primary hover:bg-primary/90 text-primary-foreground shadow-md shadow-primary/20 cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span>Hazırlanıyor...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Coffee className="h-4 w-4" />
+                          <span>Evet, Kartımı Başlat</span>
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              )
             ) : (
               /* =======================================
                  2. ACTIVE DIGITAL STAMP CARD (STARBUCKS STYLE)
@@ -465,6 +578,18 @@ export function LoyaltyStampCardModal({ isOpen, onClose }: LoyaltyStampCardModal
                 <div className="text-[11px] text-foreground/50 text-center font-medium leading-relaxed px-2">
                   * Sipariş verirken garsonunuza veya baristanıza müşteri kodunuzu (<strong>{customer.customerCode}</strong>) belirterek anında damganızı işletebilirsiniz.
                 </div>
+
+                {/* Logout / Switch Card Action */}
+                <div className="pt-1 border-t border-border/40 flex flex-col items-center justify-center">
+                  <button
+                    type="button"
+                    onClick={() => setIsLogoutConfirmOpen(true)}
+                    className="text-xs text-foreground/45 hover:text-destructive transition-colors flex items-center gap-1.5 cursor-pointer py-1.5 px-3 rounded-xl hover:bg-muted font-medium"
+                  >
+                    <LogOut className="h-3.5 w-3.5" />
+                    <span>Çıkış Yap / Kartı Değiştir</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -558,6 +683,46 @@ export function LoyaltyStampCardModal({ isOpen, onClose }: LoyaltyStampCardModal
               className="w-full py-4 rounded-2xl text-xs font-bold bg-secondary hover:bg-secondary/80 text-foreground cursor-pointer"
             >
               Tamam
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* =======================================
+          5. ÇIKIŞ YAPMA / KARTI DEĞİŞTİRME ONAY MODALI
+          ======================================= */}
+      <Dialog open={isLogoutConfirmOpen} onOpenChange={setIsLogoutConfirmOpen}>
+        <DialogContent className="max-w-sm w-full p-6 rounded-3xl bg-card border border-border shadow-2xl">
+          <DialogHeader>
+            <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-destructive/10 text-destructive text-[11px] font-bold w-fit mb-1">
+              <LogOut className="h-3.5 w-3.5" />
+              <span>Karttan Çıkış</span>
+            </div>
+            <DialogTitle className="text-base font-black font-heading">
+              Karttan Çıkış Yapılsın mı?
+            </DialogTitle>
+            <DialogDescription className="text-xs text-foreground/70 leading-relaxed pt-1">
+              Bu cihazdaki kayıtlı kart oturumunuz sonlandırılacaktır. Birikmiş damgalarınız ve hediyeleriniz kaybolmaz; telefon numaranızla tekrar giriş yaptığınızda kartınıza anında erişebilirsiniz.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex items-center justify-end gap-2 pt-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsLogoutConfirmOpen(false)}
+              className="rounded-xl text-xs font-semibold py-2.5 px-4 cursor-pointer"
+            >
+              Vazgeç
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleLogout}
+              className="rounded-xl text-xs font-bold py-2.5 px-4 cursor-pointer flex items-center gap-1.5"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              <span>Evet, Çıkış Yap</span>
             </Button>
           </div>
         </DialogContent>

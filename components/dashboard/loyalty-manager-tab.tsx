@@ -119,6 +119,13 @@ export function LoyaltyManagerTab({
       setIsDeleteDialogOpen(false)
       setCustomerToDelete(null)
 
+      // Broadcast customer deletion to all open client tabs
+      try {
+        const bc = new BroadcastChannel("konteyner_loyalty_events")
+        bc.postMessage({ type: "CUSTOMER_DELETED", customerId })
+        bc.close()
+      } catch {}
+
       // If active customer was deleted, clear active view
       if (selectedCustomer?.id === customerId) {
         setSelectedCustomer(null)

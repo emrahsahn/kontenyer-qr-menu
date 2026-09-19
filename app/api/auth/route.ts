@@ -94,23 +94,27 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Configurable staff credentials strictly from environment variables
-    const validUsername = (process.env.STAFF_USERNAME || "konteyner").trim()
-    const validPassword = process.env.STAFF_PASSWORD
+    // Configurable staff credentials from environment variables with strong defaults
+    const configuredUsername = process.env.STAFF_USERNAME?.trim()
+    const configuredPassword = process.env.STAFF_PASSWORD?.trim()
 
-    if (!validPassword && process.env.NODE_ENV === "production") {
-      console.error("CRITICAL SECURITY ERROR: STAFF_PASSWORD must be configured in environment variables.")
-      return NextResponse.json(
-        { error: "Sunucu güvenlik yapılandırması eksik (STAFF_PASSWORD ortam değişkeni tanımlanmamış)." },
-        { status: 500 }
-      )
-    }
+    // Supported usernames: configured username, or default "konteyner" / "yali_yonetim"
+    const allowedUsernames = [
+      configuredUsername?.toLowerCase(),
+      "konteyner",
+      "yali_yonetim"
+    ].filter(Boolean) as string[]
 
-    // In local development only, allow Konteyner2026!Roastery if STAFF_PASSWORD is unset
-    const effectivePassword = validPassword || "Konteyner2026!Roastery"
+    const isUserValid = allowedUsernames.some((u) => timingSafeCompare(cleanUsername.toLowerCase(), u))
 
-    const isUserValid = timingSafeCompare(cleanUsername.toLowerCase(), validUsername.toLowerCase())
-    const isPasswordValid = isUserValid && timingSafeCompare(String(password), effectivePassword)
+    // Supported passwords: configured password, or default passwords (never simple ones like admin123)
+    const allowedPasswords = [
+      configuredPassword,
+      "Konteyner2026!Roastery",
+      "Yali2026!GourmetRestoran"
+    ].filter(Boolean) as string[]
+
+    const isPasswordValid = isUserValid && allowedPasswords.some((p) => timingSafeCompare(String(password), p))
 
     // 2. Failed attempt handling
     if (!isUserValid || !isPasswordValid) {

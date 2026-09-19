@@ -78,7 +78,7 @@ export default function LoginPage() {
                 </span>
                 <input
                   type="text"
-                  placeholder="Kullanıcı adınız (örn: gorevli veya admin)"
+                  placeholder="Kullanıcı adınız"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   disabled={loading}

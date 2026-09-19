@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     authenticated: true,
     user: {
       id: "u_staff",
-      username: auth.username || "yali_yonetim",
+      username: auth.username || "staff",
       displayName: "Cafe Görevlisi",
       role: "staff",
       venue: "cafe"
@@ -94,27 +94,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Configurable staff credentials from environment variables with strong defaults
-    const configuredUsername = process.env.STAFF_USERNAME?.trim()
-    const configuredPassword = process.env.STAFF_PASSWORD?.trim()
+    // Strict credentials from environment variables ONLY (no hardcoded in-code fallbacks)
+    const validUsername = process.env.STAFF_USERNAME?.trim()
+    const validPassword = process.env.STAFF_PASSWORD?.trim()
 
-    // Supported usernames: configured username, or default "konteyner" / "yali_yonetim"
-    const allowedUsernames = [
-      configuredUsername?.toLowerCase(),
-      "konteyner",
-      "yali_yonetim"
-    ].filter(Boolean) as string[]
+    if (!validUsername || !validPassword) {
+      return NextResponse.json(
+        {
+          error: "Sunucu güvenlik yapılandırması eksik: STAFF_USERNAME veya STAFF_PASSWORD ortam değişkeni tanımlanmamış."
+        },
+        { status: 500 }
+      )
+    }
 
-    const isUserValid = allowedUsernames.some((u) => timingSafeCompare(cleanUsername.toLowerCase(), u))
-
-    // Supported passwords: configured password, or default passwords (never simple ones like admin123)
-    const allowedPasswords = [
-      configuredPassword,
-      "Konteyner2026!Roastery",
-      "Yali2026!GourmetRestoran"
-    ].filter(Boolean) as string[]
-
-    const isPasswordValid = isUserValid && allowedPasswords.some((p) => timingSafeCompare(String(password), p))
+    const isUserValid = timingSafeCompare(cleanUsername.toLowerCase(), validUsername.toLowerCase())
+    const isPasswordValid = isUserValid && timingSafeCompare(String(password), validPassword)
 
     // 2. Failed attempt handling
     if (!isUserValid || !isPasswordValid) {

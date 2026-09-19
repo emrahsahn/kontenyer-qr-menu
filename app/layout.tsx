@@ -21,18 +21,20 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   icons: {
     icon: [
-      { url: "/logo.png", sizes: "any", type: "image/png" },
-      { url: "/favicon.ico" },
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/favicon.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon.png", sizes: "512x512", type: "image/png" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
     ],
-    shortcut: "/logo.png",
+    shortcut: "/favicon.ico",
     apple: [
-      { url: "/logo.png", sizes: "180x180", type: "image/png" },
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
   },
   openGraph: {
     title: "Konteyner Cafe & Roastery",
     description: "Nitelikli kahveler ve lezzetler",
-    images: ["/logo.png"],
+    images: ["/icon.png"],
   },
   appleWebApp: {
     capable: true,
@@ -58,6 +60,12 @@ export default function RootLayout({ children }: LayoutProps) {
       suppressHydrationWarning
       className={`${inter.variable} ${playfair.variable} h-full antialiased`}
     >
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="32x32" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+      </head>
       <body
         suppressHydrationWarning
         className="min-h-full flex flex-col bg-background text-foreground transition-colors duration-300"

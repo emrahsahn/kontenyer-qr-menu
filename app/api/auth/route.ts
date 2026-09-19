@@ -94,29 +94,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Configurable credentials from environment variables with strong defaults
-    const validUsername = process.env.STAFF_USERNAME || "yali_yonetim"
-    const validPassword = process.env.STAFF_PASSWORD || "Yali2026!GourmetRestoran"
+    // Configurable staff credentials strictly from environment variables
+    const validUsername = (process.env.STAFF_USERNAME || "konteyner").trim()
+    const validPassword = process.env.STAFF_PASSWORD
 
-    // Support staff username and fallback aliases (yali_yonetim, konteyner, gorevli, admin)
-    const isUserValid =
-      timingSafeCompare(cleanUsername.toLowerCase(), validUsername.toLowerCase()) ||
-      timingSafeCompare(cleanUsername.toLowerCase(), "konteyner") ||
-      timingSafeCompare(cleanUsername.toLowerCase(), "gorevli") ||
-      timingSafeCompare(cleanUsername.toLowerCase(), "admin")
-
-    let isPasswordValid = false
-    if (isUserValid) {
-      const p = String(password)
-      // Master Yali password works for all valid user accounts
-      if (timingSafeCompare(p, validPassword) || timingSafeCompare(p, "Yali2026!GourmetRestoran")) {
-        isPasswordValid = true
-      } else if (cleanUsername.toLowerCase() === "gorevli" && timingSafeCompare(p, "gorevli123")) {
-        isPasswordValid = true
-      } else if (cleanUsername.toLowerCase() === "admin" && timingSafeCompare(p, "admin123")) {
-        isPasswordValid = true
-      }
+    if (!validPassword && process.env.NODE_ENV === "production") {
+      console.error("CRITICAL SECURITY ERROR: STAFF_PASSWORD must be configured in environment variables.")
+      return NextResponse.json(
+        { error: "Sunucu güvenlik yapılandırması eksik (STAFF_PASSWORD ortam değişkeni tanımlanmamış)." },
+        { status: 500 }
+      )
     }
+
+    // In local development only, allow Konteyner2026!Roastery if STAFF_PASSWORD is unset
+    const effectivePassword = validPassword || "Konteyner2026!Roastery"
+
+    const isUserValid = timingSafeCompare(cleanUsername.toLowerCase(), validUsername.toLowerCase())
+    const isPasswordValid = isUserValid && timingSafeCompare(String(password), effectivePassword)
 
     // 2. Failed attempt handling
     if (!isUserValid || !isPasswordValid) {
@@ -163,13 +157,22 @@ export async function POST(request: NextRequest) {
 
     // Set secure, HttpOnly cookie (Protected against XSS and script theft)
     response.cookies.set({
-      name: "yali_staff_auth",
+      name: "konteyner_staff_auth",
       value: sessionToken,
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 7 // 7 days
+    })
+    response.cookies.set({
+      name: "yali_staff_auth",
+      value: sessionToken,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7
     })
 
     return response
@@ -183,13 +186,22 @@ export async function POST(request: NextRequest) {
 export async function DELETE() {
   const response = NextResponse.json({ success: true })
   response.cookies.set({
+    name: "konteyner_staff_auth",
+    value: "",
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0
+  })
+  response.cookies.set({
     name: "yali_staff_auth",
     value: "",
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: 0 // Expire immediately
+    maxAge: 0
   })
   return response
 }

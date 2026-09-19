@@ -1,11 +1,25 @@
 import { NextRequest } from "next/server"
 import crypto from "crypto"
 
-const DEFAULT_SECRET = "konteyner_super_secret_signing_key_2026"
+let runtimeDevSecret: string | null = null
 const MAX_SESSION_AGE_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
 
 function getSecret(): string {
-  return process.env.AUTH_SECRET || DEFAULT_SECRET
+  if (process.env.AUTH_SECRET && process.env.AUTH_SECRET.trim().length >= 16) {
+    return process.env.AUTH_SECRET.trim()
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "CRITICAL SECURITY CONFIGURATION ERROR: AUTH_SECRET environment variable is missing or too short in production! Set AUTH_SECRET with at least 16 random characters."
+    )
+  }
+
+  // Development ephemeral secret generated at server boot (changes each server start, prevents static forgery)
+  if (!runtimeDevSecret) {
+    runtimeDevSecret = crypto.randomBytes(32).toString("hex")
+  }
+  return runtimeDevSecret
 }
 
 // Timing-safe string comparison to prevent timing attacks
@@ -62,22 +76,14 @@ export function verifySessionToken(token: string): { valid: boolean; username?: 
     return { valid: false }
   }
 
-  // Recompute expected HMAC signature with active secret or migration fallback
-  const candidateSecrets = [
-    getSecret(),
-    "konteyner_super_secret_signing_key_2026",
-    "yali_super_secret_signing_key_2026"
-  ]
+  // Recompute expected HMAC signature with current active secret
+  const secret = getSecret()
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(`${username}:${timestampStr}`)
+    .digest("hex")
 
-  const isSignatureValid = candidateSecrets.some((sec) => {
-    const expected = crypto
-      .createHmac("sha256", sec)
-      .update(`${username}:${timestampStr}`)
-      .digest("hex")
-    return timingSafeCompare(signature, expected)
-  })
-
-  if (!isSignatureValid) {
+  if (!timingSafeCompare(signature, expected)) {
     return { valid: false }
   }
 

@@ -38,11 +38,6 @@ export function LoyaltyStampCardModal({ isOpen, onClose }: LoyaltyStampCardModal
   const [customer, setCustomer] = useState<LoyaltyCustomer | null>(() => {
     if (typeof window === "undefined") return null
     try {
-      const urlParams = new URLSearchParams(window.location.search)
-      if (urlParams.has("reset_card")) {
-        localStorage.removeItem(LOCAL_STORAGE_KEY)
-        return null
-      }
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY)
       if (saved) {
         const parsed = JSON.parse(saved) as LoyaltyCustomer

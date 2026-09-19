@@ -8,6 +8,7 @@ import {
   updateCustomer
 } from "@/lib/data/loyalty-store"
 import { verifyStaffSession } from "@/lib/security/auth-guard"
+import { checkGeneralRateLimit } from "@/lib/security/rate-limiter"
 
 // GET: Retrieve customer by id, search customers, or list all customers (staff)
 export async function GET(request: NextRequest) {
@@ -62,6 +63,19 @@ export async function GET(request: NextRequest) {
 // POST: Register or sign-in customer with Name, Phone & KVKK consent
 export async function POST(request: NextRequest) {
   try {
+    const forwarded = request.headers.get("x-forwarded-for")
+    const ip = forwarded ? forwarded.split(",")[0].trim() : request.headers.get("x-real-ip") || "127.0.0.1"
+    const rateLimit = checkGeneralRateLimit(`loyalty_reg_${ip}`, 12, 60 * 1000)
+
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        {
+          error: `Çok fazla kart oluşturma isteği yapıldı. Güvenliğiniz için lütfen ${rateLimit.retryAfterSeconds} saniye sonra tekrar deneyiniz.`
+        },
+        { status: 429 }
+      )
+    }
+
     const body = await request.json().catch(() => null)
     if (!body) {
       return NextResponse.json(

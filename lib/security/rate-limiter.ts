@@ -206,3 +206,31 @@ export function resetAttempts(ip: string, username?: string): void {
     userAttempts.delete(cleanUser);
   }
 }
+
+// General sliding-window rate limiter for public forms & endpoints
+const generalRateLimits = new Map<string, { count: number; resetTime: number }>();
+
+export function checkGeneralRateLimit(
+  key: string,
+  maxRequests = 10,
+  windowMs = 60 * 1000
+): { allowed: boolean; retryAfterSeconds: number } {
+  const now = Date.now();
+  const entry = generalRateLimits.get(key);
+
+  if (!entry || now > entry.resetTime) {
+    generalRateLimits.set(key, { count: 1, resetTime: now + windowMs });
+    return { allowed: true, retryAfterSeconds: 0 };
+  }
+
+  if (entry.count >= maxRequests) {
+    return {
+      allowed: false,
+      retryAfterSeconds: Math.ceil((entry.resetTime - now) / 1000)
+    };
+  }
+
+  entry.count += 1;
+  return { allowed: true, retryAfterSeconds: 0 };
+}
+

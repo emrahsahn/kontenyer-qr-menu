@@ -319,23 +319,23 @@ export default function StaffPanelPage() {
       )}
 
       {/* Main Container */}
-      <div className="w-full flex-1 flex flex-col pt-2">
+      <div className="w-full flex-1 flex flex-col pt-1 sm:pt-2 min-w-0 max-w-full overflow-x-hidden">
         
         {/* Top Tab Navigation & Status Bar */}
-        <div className="w-full border border-border bg-card rounded-2xl p-2 mb-6 flex flex-wrap items-center justify-between gap-3 shadow-xs">
-          <div className="flex items-center gap-1.5">
+        <div className="w-full border border-border bg-card rounded-2xl p-1.5 sm:p-2 mb-4 sm:mb-6 flex items-center justify-between gap-2 shadow-xs overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-1.5 min-w-max">
             <button
               type="button"
               onClick={() => setActiveTab("menu")}
-              className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer shrink-0 ${
                 activeTab === "menu"
                   ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
                   : "text-foreground/60 hover:text-foreground hover:bg-muted"
               }`}
             >
-              <Layers className="h-4 w-4" />
-              <span>Menü & Ürün Yönetimi</span>
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+              <Layers className="h-4 w-4 shrink-0" />
+              <span>Menü &amp; Ürün Yönetimi</span>
+              <span className={`px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] font-black ${
                 activeTab === "menu" ? "bg-primary-foreground/20 text-primary-foreground" : "bg-secondary text-foreground/70"
               }`}>
                 {products.length}
@@ -345,13 +345,13 @@ export default function StaffPanelPage() {
             <button
               type="button"
               onClick={() => setActiveTab("loyalty")}
-              className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer shrink-0 ${
                 activeTab === "loyalty"
                   ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
                   : "text-foreground/60 hover:text-foreground hover:bg-muted"
               }`}
             >
-              <Coffee className="h-4 w-4 text-amber-500" />
+              <Coffee className="h-4 w-4 text-amber-500 shrink-0" />
               <span>Sadakat Programı</span>
               <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-amber-500/20 text-amber-600 dark:text-amber-400">
                 Damga
@@ -361,19 +361,19 @@ export default function StaffPanelPage() {
             <button
               type="button"
               onClick={() => setActiveTab("qr")}
-              className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer shrink-0 ${
                 activeTab === "qr"
                   ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
                   : "text-foreground/60 hover:text-foreground hover:bg-muted"
               }`}
             >
-              <QrCode className="h-4 w-4" />
-              <span>QR Kod & Menü Bağlantısı</span>
+              <QrCode className="h-4 w-4 shrink-0" />
+              <span>QR Kod &amp; Menü Bağlantısı</span>
             </button>
           </div>
 
-          {/* Quick Counts */}
-          <div className="hidden sm:flex items-center gap-2 px-2">
+          {/* Quick Counts (Large screens) */}
+          <div className="hidden lg:flex items-center gap-2 px-2 shrink-0">
             <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
               {activeCount} Aktif
             </span>
@@ -387,22 +387,22 @@ export default function StaffPanelPage() {
         
         {/* TAB 1: MENU & PRODUCT MANAGEMENT */}
         {activeTab === "menu" && (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-4 sm:gap-6 min-w-0 max-w-full">
             
             {/* Action Bar & Quick Stats */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card/60 p-5 rounded-3xl border border-border">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 sm:gap-4 bg-card/60 p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-border">
               {/* Stats & Quick overview */}
-              <div className="flex flex-wrap items-center gap-3 text-xs">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-secondary border border-border font-semibold">
-                  <span>Toplam Ürün:</span>
+              <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 text-xs">
+                <div className="flex items-center justify-between sm:justify-start gap-2 px-3 py-2 sm:py-1.5 rounded-xl bg-secondary border border-border font-semibold">
+                  <span className="text-foreground/70">Toplam Ürün:</span>
                   <strong className="text-foreground">{products.length}</strong>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-semibold">
+                <div className="flex items-center justify-between sm:justify-start gap-2 px-3 py-2 sm:py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-semibold">
                   <span>Aktif (Stokta):</span>
                   <strong>{activeCount}</strong>
                 </div>
                 {outOfStockCount > 0 && (
-                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive font-semibold animate-pulse">
+                  <div className="col-span-2 sm:col-span-1 flex items-center justify-between sm:justify-start gap-2 px-3 py-2 sm:py-1.5 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive font-semibold animate-pulse">
                     <span>Tükendi:</span>
                     <strong>{outOfStockCount}</strong>
                   </div>
@@ -410,24 +410,26 @@ export default function StaffPanelPage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setIsBackupModalOpen(true)}
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-secondary hover:bg-secondary/80 border border-border text-xs font-bold text-foreground transition-all cursor-pointer"
-                >
-                  <HardDriveDownload className="h-4 w-4 text-primary" />
-                  <span>Yedekle & Aktar</span>
-                </button>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5">
+                <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 sm:gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsBackupModalOpen(true)}
+                    className="flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl sm:rounded-2xl bg-secondary hover:bg-secondary/80 border border-border text-xs font-bold text-foreground transition-all cursor-pointer"
+                  >
+                    <HardDriveDownload className="h-4 w-4 text-primary shrink-0" />
+                    <span className="truncate">Yedekle &amp; Aktar</span>
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => setIsCategoryModalOpen(true)}
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-secondary hover:bg-secondary/80 border border-border text-xs font-bold text-foreground transition-all cursor-pointer"
-                >
-                  <Layers className="h-4 w-4 text-primary" />
-                  <span>Kategorileri Yönet</span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsCategoryModalOpen(true)}
+                    className="flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl sm:rounded-2xl bg-secondary hover:bg-secondary/80 border border-border text-xs font-bold text-foreground transition-all cursor-pointer"
+                  >
+                    <Layers className="h-4 w-4 text-primary shrink-0" />
+                    <span className="truncate">Kategorileri Yönet</span>
+                  </button>
+                </div>
 
                 <button
                   type="button"
@@ -435,19 +437,19 @@ export default function StaffPanelPage() {
                     setSelectedProduct(null)
                     setIsProductModalOpen(true)
                   }}
-                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold shadow-md shadow-primary/20 transition-all cursor-pointer"
+                  className="flex items-center justify-center gap-1.5 px-5 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold shadow-md shadow-primary/20 transition-all cursor-pointer w-full sm:w-auto"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 shrink-0" />
                   <span>Yeni Ürün Ekle</span>
                 </button>
               </div>
             </div>
 
             {/* Search & Category Filter Toolbar */}
-            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               {/* Search input */}
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/40" />
+              <div className="relative flex-1">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/40 pointer-events-none" />
                 <input
                   type="text"
                   placeholder="Yemek adı, içerik veya açıklama ara..."
@@ -458,12 +460,12 @@ export default function StaffPanelPage() {
               </div>
 
               {/* Status Filter */}
-              <div className="flex items-center gap-1.5 bg-card p-1 rounded-2xl border border-border">
+              <div className="grid grid-cols-3 sm:flex items-center gap-1 bg-card p-1 rounded-2xl border border-border shrink-0">
                 <button
                   type="button"
                   onClick={() => setStatusFilter("all")}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    statusFilter === "all" ? "bg-primary text-primary-foreground" : "text-foreground/60 hover:text-foreground"
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
+                    statusFilter === "all" ? "bg-primary text-primary-foreground shadow-xs" : "text-foreground/60 hover:text-foreground"
                   }`}
                 >
                   Tümü ({products.length})
@@ -471,8 +473,8 @@ export default function StaffPanelPage() {
                 <button
                   type="button"
                   onClick={() => setStatusFilter("active")}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    statusFilter === "active" ? "bg-primary text-primary-foreground" : "text-foreground/60 hover:text-foreground"
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
+                    statusFilter === "active" ? "bg-primary text-primary-foreground shadow-xs" : "text-foreground/60 hover:text-foreground"
                   }`}
                 >
                   Stokta ({activeCount})
@@ -480,8 +482,8 @@ export default function StaffPanelPage() {
                 <button
                   type="button"
                   onClick={() => setStatusFilter("inactive")}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    statusFilter === "inactive" ? "bg-primary text-primary-foreground" : "text-foreground/60 hover:text-foreground"
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
+                    statusFilter === "inactive" ? "bg-primary text-primary-foreground shadow-xs" : "text-foreground/60 hover:text-foreground"
                   }`}
                 >
                   Tükendi ({outOfStockCount})
@@ -490,13 +492,13 @@ export default function StaffPanelPage() {
             </div>
 
             {/* Category Pills */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+            <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1.5 no-scrollbar -mx-1 px-1">
               <button
                 type="button"
                 onClick={() => setSelectedCategory("all")}
-                className={`px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer border ${
+                className={`px-3.5 sm:px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer border shrink-0 ${
                   selectedCategory === "all"
-                    ? "bg-primary/15 border-primary text-primary"
+                    ? "bg-primary/15 border-primary text-primary shadow-2xs"
                     : "bg-card border-border text-foreground/70 hover:text-foreground"
                 }`}
               >
@@ -507,9 +509,9 @@ export default function StaffPanelPage() {
                   key={cat.id}
                   type="button"
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer border ${
+                  className={`px-3.5 sm:px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer border shrink-0 ${
                     selectedCategory === cat.id
-                      ? "bg-primary/15 border-primary text-primary"
+                      ? "bg-primary/15 border-primary text-primary shadow-2xs"
                       : "bg-card border-border text-foreground/70 hover:text-foreground"
                   }`}
                 >
@@ -525,7 +527,7 @@ export default function StaffPanelPage() {
                 <span className="text-xs font-semibold">Menü ürünleri yükleniyor...</span>
               </div>
             ) : filteredProducts.length === 0 ? (
-              <div className="p-12 rounded-3xl bg-card border border-border flex flex-col items-center justify-center text-center gap-3">
+              <div className="p-8 sm:p-12 rounded-3xl bg-card border border-border flex flex-col items-center justify-center text-center gap-3">
                 <Utensils className="h-8 w-8 text-foreground/40" />
                 <h3 className="font-bold text-base">Aradığınız kriterde ürün bulunamadı</h3>
                 <p className="text-xs text-foreground/60 max-w-sm">
@@ -533,7 +535,7 @@ export default function StaffPanelPage() {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {filteredProducts.map((product) => {
                   const isSoldOut = !product.aktif
                   const categoryName = categories.find((c) => c.id === product.kategori_id)?.ad_tr || "Kategori"
@@ -541,13 +543,13 @@ export default function StaffPanelPage() {
                   return (
                     <div
                       key={product.id}
-                      className={`relative flex flex-col rounded-3xl border bg-card p-4 transition-all duration-300 shadow-sm hover:shadow-md ${
-                        isSoldOut ? "border-destructive/30 bg-card/60 opacity-80" : "border-border"
+                      className={`relative flex flex-col rounded-2xl sm:rounded-3xl border bg-card p-3.5 sm:p-4 transition-all duration-300 shadow-sm hover:shadow-md ${
+                        isSoldOut ? "border-destructive/30 bg-card/60 opacity-85" : "border-border"
                       }`}
                     >
                       {/* Top Row: Image & Info */}
-                      <div className="flex gap-3.5">
-                        <div className="relative h-24 w-24 flex-shrink-0 rounded-2xl overflow-hidden bg-muted">
+                      <div className="flex gap-3">
+                        <div className="relative h-20 w-20 sm:h-24 sm:w-24 flex-shrink-0 rounded-xl sm:rounded-2xl overflow-hidden bg-muted">
                           <Image
                             src={product.gorsel_url || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=60"}
                             alt={product.ad_tr}
@@ -556,8 +558,8 @@ export default function StaffPanelPage() {
                             className={`object-cover ${isSoldOut ? "grayscale-[50%]" : ""}`}
                           />
                           {isSoldOut && (
-                            <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] flex items-center justify-center">
-                              <span className="bg-destructive text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] flex items-center justify-center p-1">
+                              <span className="bg-destructive text-white text-[8px] sm:text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider text-center">
                                 TÜKENDİ
                               </span>
                             </div>
@@ -565,30 +567,32 @@ export default function StaffPanelPage() {
                         </div>
 
                         {/* Title, Category & Price */}
-                        <div className="flex-1 flex flex-col min-w-0">
-                          <div className="flex items-start justify-between gap-1">
-                            <span className="text-[10px] font-extrabold text-primary uppercase tracking-wider truncate">
-                              {categoryName}
-                            </span>
-                            <span className="font-sans font-extrabold text-sm text-primary tabular-nums tracking-tight whitespace-nowrap">
-                              {product.porsiyonlar && product.porsiyonlar.length > 1
-                                ? `₺${Math.min(...product.porsiyonlar.map(p => Number(p.fiyat) || 0)).toFixed(2)}'den`
-                                : `₺${Number(product.fiyat).toFixed(2)}`}
-                            </span>
+                        <div className="flex-1 flex flex-col min-w-0 justify-between">
+                          <div>
+                            <div className="flex items-center justify-between gap-1.5">
+                              <span className="text-[10px] font-extrabold text-primary uppercase tracking-wider truncate">
+                                {categoryName}
+                              </span>
+                              <span className="font-sans font-extrabold text-xs sm:text-sm text-primary tabular-nums tracking-tight whitespace-nowrap">
+                                {product.porsiyonlar && product.porsiyonlar.length > 1
+                                  ? `₺${Math.min(...product.porsiyonlar.map(p => Number(p.fiyat) || 0)).toFixed(2)}'den`
+                                  : `₺${Number(product.fiyat).toFixed(2)}`}
+                              </span>
+                            </div>
+
+                            <h3 className="font-heading font-bold text-sm text-foreground truncate mt-0.5">
+                              {product.ad_tr}
+                            </h3>
+
+                            {product.aciklama_tr && (
+                              <p className="text-[11px] text-foreground/60 line-clamp-2 mt-0.5 font-medium leading-snug">
+                                {product.aciklama_tr}
+                              </p>
+                            )}
                           </div>
 
-                          <h3 className="font-heading font-bold text-sm text-foreground truncate mt-0.5">
-                            {product.ad_tr}
-                          </h3>
-
-                          {product.aciklama_tr && (
-                            <p className="text-[11px] text-foreground/60 line-clamp-2 mt-1 font-medium leading-snug">
-                              {product.aciklama_tr}
-                            </p>
-                          )}
-
                           {/* Quick Badges */}
-                          <div className="flex flex-wrap gap-1 mt-auto pt-2">
+                          <div className="flex flex-wrap gap-1 pt-1.5">
                             {product.porsiyonlar && product.porsiyonlar.length > 1 && (
                               <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-primary/15 text-primary">
                                 ✨ {product.porsiyonlar.length} Seçenek
@@ -614,7 +618,7 @@ export default function StaffPanelPage() {
                       </div>
 
                       {/* Divider */}
-                      <div className="h-px w-full bg-border my-3" />
+                      <div className="h-px w-full bg-border my-2.5 sm:my-3" />
 
                       {/* Bottom Controls */}
                       <div className="flex items-center justify-between gap-2">
@@ -622,7 +626,7 @@ export default function StaffPanelPage() {
                         <button
                           type="button"
                           onClick={() => handleToggleActive(product)}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer border ${
+                          className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer border ${
                             product.aktif
                               ? "bg-emerald-500/10 hover:bg-emerald-500/20 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
                               : "bg-destructive/15 hover:bg-destructive/25 border-destructive/40 text-destructive"
@@ -630,19 +634,19 @@ export default function StaffPanelPage() {
                         >
                           {product.aktif ? (
                             <>
-                              <Eye className="h-3.5 w-3.5" />
+                              <Eye className="h-3.5 w-3.5 shrink-0" />
                               <span>Stokta (Aktif)</span>
                             </>
                           ) : (
                             <>
-                              <EyeOff className="h-3.5 w-3.5" />
+                              <EyeOff className="h-3.5 w-3.5 shrink-0" />
                               <span>Tükendi Yapıldı</span>
                             </>
                           )}
                         </button>
 
                         {/* Edit & Delete Action Buttons */}
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 shrink-0">
                           <button
                             type="button"
                             onClick={() => {

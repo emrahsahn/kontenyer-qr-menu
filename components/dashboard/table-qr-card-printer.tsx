@@ -144,15 +144,15 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
   }
 
   return (
-    <div className="w-full flex flex-col gap-8">
+    <div className="w-full flex flex-col gap-4 sm:gap-8 min-w-0 max-w-full">
       {/* Configuration Controls Bar */}
-      <div className="p-6 rounded-3xl bg-card border border-border shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-card border border-border shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2 text-primary font-black text-xs uppercase tracking-widest">
-            <Settings2 className="h-4 w-4" />
+            <Settings2 className="h-4 w-4 shrink-0" />
             7.5 × 10 CM MASA BASKI ŞABLONU
           </div>
-          <h3 className="font-heading font-black text-xl text-foreground">
+          <h3 className="font-heading font-black text-lg sm:text-xl text-foreground">
             Cafe Masa Kartı &amp; QR Üretici
           </h3>
           <p className="text-xs text-foreground/60">
@@ -161,7 +161,7 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
         </div>
 
         {/* Inputs */}
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="grid grid-cols-3 sm:flex items-center gap-2 sm:gap-4 w-full md:w-auto">
           <div className="flex flex-col gap-1">
             <label className="text-[10px] font-black uppercase text-foreground/60 tracking-wider">
               Masa Ön Eki
@@ -171,7 +171,7 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
               value={prefix}
               onChange={(e) => setPrefix(e.target.value)}
               placeholder="M-"
-              className="w-20 px-3 py-2 rounded-xl bg-secondary border border-border text-xs font-black text-foreground text-center focus:outline-none focus:border-primary"
+              className="w-full sm:w-20 px-2 sm:px-3 py-2 rounded-xl bg-secondary border border-border text-xs font-black text-foreground text-center focus:outline-none focus:border-primary"
             />
           </div>
 
@@ -185,7 +185,7 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
               max={999}
               value={startNumber}
               onChange={(e) => setStartNumber(Math.max(1, parseInt(e.target.value) || 1))}
-              className="w-20 px-3 py-2 rounded-xl bg-secondary border border-border text-xs font-black text-foreground text-center focus:outline-none focus:border-primary"
+              className="w-full sm:w-20 px-2 sm:px-3 py-2 rounded-xl bg-secondary border border-border text-xs font-black text-foreground text-center focus:outline-none focus:border-primary"
             />
           </div>
 
@@ -199,14 +199,14 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
               max={100}
               value={tableCount}
               onChange={(e) => setTableCount(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
-              className="w-24 px-3 py-2 rounded-xl bg-secondary border border-border text-xs font-black text-foreground text-center focus:outline-none focus:border-primary"
+              className="w-full sm:w-24 px-2 sm:px-3 py-2 rounded-xl bg-secondary border border-border text-xs font-black text-foreground text-center focus:outline-none focus:border-primary"
             />
           </div>
         </div>
       </div>
 
       {/* Main Preview and Actions Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
         {/* Left: 7.5cm x 10cm Card Mockup Simulator */}
         <div className="lg:col-span-5 flex flex-col items-center gap-4">
           <div className="flex items-center justify-between w-full max-w-[280px] px-1">
@@ -286,22 +286,22 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
         </div>
 
         {/* Right: Batch Actions & Table Grid */}
-        <div className="lg:col-span-7 flex flex-col gap-6">
+        <div className="lg:col-span-7 flex flex-col gap-4 sm:gap-6">
           {/* Main Action Buttons */}
-          <div className="p-6 rounded-3xl bg-card border border-border shadow-md flex flex-col gap-4">
-            <h4 className="font-heading font-black text-lg text-foreground flex items-center gap-2">
+          <div className="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-card border border-border shadow-md flex flex-col gap-3 sm:gap-4">
+            <h4 className="font-heading font-black text-base sm:text-lg text-foreground flex items-center gap-2">
               <Printer className="h-5 w-5 text-primary" />
-              Yazdırma & İndirme Seçenekleri
+              Yazdırma &amp; İndirme Seçenekleri
             </h4>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
               {/* 1. Print / Save to PDF (All Tables A4 layout) */}
               <button
                 type="button"
                 onClick={handlePrint}
-                className="flex items-center justify-center gap-2 px-5 py-4 rounded-2xl bg-primary hover:bg-primary/95 text-primary-foreground font-black text-xs uppercase tracking-wider shadow-lg shadow-primary/25 transition-all cursor-pointer"
+                className="flex items-center justify-center gap-2 px-4 sm:px-5 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-primary hover:bg-primary/95 text-primary-foreground font-black text-xs uppercase tracking-wider shadow-lg shadow-primary/25 transition-all cursor-pointer"
               >
-                <Printer className="h-4 w-4" />
+                <Printer className="h-4 w-4 shrink-0" />
                 <span>Tüm Masaları Yazdır (A4 / PDF)</span>
               </button>
 
@@ -310,14 +310,14 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
                 type="button"
                 onClick={() => downloadSingleCardPng(currentTable)}
                 disabled={isExporting}
-                className="flex items-center justify-center gap-2 px-5 py-4 rounded-2xl bg-secondary hover:bg-secondary/80 border border-border text-foreground font-black text-xs uppercase tracking-wider transition-all cursor-pointer"
+                className="flex items-center justify-center gap-2 px-4 sm:px-5 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-secondary hover:bg-secondary/80 border border-border text-foreground font-black text-xs uppercase tracking-wider transition-all cursor-pointer"
               >
-                <Download className="h-4 w-4 text-primary" />
+                <Download className="h-4 w-4 text-primary shrink-0" />
                 <span>Seçili Kartı İndir ({currentTable.label})</span>
               </button>
             </div>
 
-            <div className="flex items-center justify-between pt-2 border-t border-border">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-2 border-t border-border">
               <span className="text-xs text-foreground/60 font-semibold">
                 Toplam <strong>{tables.length}</strong> masa kartı hazırlandı ({tables[0]?.label} — {tables[tables.length - 1]?.label}).
               </span>

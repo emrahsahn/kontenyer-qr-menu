@@ -60,9 +60,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col pl-0 md:pl-64 w-full">
+      <div className="flex-1 flex flex-col pl-0 md:pl-64 w-full min-w-0 max-w-full overflow-x-hidden">
         <DashboardHeader onOpenSidebar={() => setSidebarOpen(true)} />
-        <main className="flex-1 p-4 md:p-8 bg-gradient-to-b from-amber-500/2 via-transparent to-primary/2">
+        <main className="flex-1 p-3 sm:p-6 md:p-8 min-w-0 max-w-full overflow-x-hidden bg-gradient-to-b from-amber-500/2 via-transparent to-primary/2">
           {children}
         </main>
       </div>

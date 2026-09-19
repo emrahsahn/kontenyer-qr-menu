@@ -15,12 +15,24 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://kontenyer.vercel.app"),
   title: "Konteyner Cafe & Roastery | Dijital QR Menü",
   description: "Konteyner Cafe & Roastery özel nitelikli kahveler, tatlılar ve fırın lezzetleri dijital menüsü",
   manifest: "/manifest.json",
   icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
+    icon: [
+      { url: "/logo.png", sizes: "any", type: "image/png" },
+      { url: "/favicon.ico" },
+    ],
+    shortcut: "/logo.png",
+    apple: [
+      { url: "/logo.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
+  openGraph: {
+    title: "Konteyner Cafe & Roastery",
+    description: "Nitelikli kahveler ve lezzetler",
+    images: ["/logo.png"],
   },
   appleWebApp: {
     capable: true,

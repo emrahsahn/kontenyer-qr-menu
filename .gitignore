@@ -15,6 +15,8 @@
 
 # Folders & Internal Docs
 /yali
+/strix/
+strix/
 QR_SISTEM_MIMARISI_VE_SUBE_UYARLAMA_REHBERI.md
 
 # Environment files (DO NOT COMMIT SECRETS)

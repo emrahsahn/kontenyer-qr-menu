@@ -326,34 +326,34 @@ export function LoyaltyManagerTab({
   const targetStamps = config?.targetStamps || 4
 
   return (
-    <div className="max-w-6xl mx-auto w-full flex flex-col gap-6">
+    <div className="max-w-6xl mx-auto w-full flex flex-col gap-4 sm:gap-6 min-w-0 max-w-full">
       {/* Sub Tab Switcher */}
-      <div className="flex items-center justify-between gap-3 bg-card p-2 rounded-2xl border border-border">
-        <div className="flex items-center gap-1.5">
+      <div className="flex items-center justify-between gap-2 bg-card p-1.5 sm:p-2 rounded-2xl border border-border overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-1.5 min-w-max">
           <button
             type="button"
             onClick={() => setSubTab("operations")}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer shrink-0 ${
               subTab === "operations"
                 ? "bg-primary text-primary-foreground shadow-xs"
                 : "text-foreground/70 hover:text-foreground hover:bg-muted"
             }`}
           >
-            <UserCheck className="h-4 w-4" />
-            <span>Müşteri & Damga İşlemleri</span>
+            <UserCheck className="h-4 w-4 shrink-0" />
+            <span>Müşteri &amp; Damga İşlemleri</span>
           </button>
 
           <button
             type="button"
             onClick={() => setSubTab("settings")}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer shrink-0 ${
               subTab === "settings"
                 ? "bg-primary text-primary-foreground shadow-xs"
                 : "text-foreground/70 hover:text-foreground hover:bg-muted"
             }`}
           >
-            <Settings className="h-4 w-4" />
-            <span>Kampanya & Damga Ayarları</span>
+            <Settings className="h-4 w-4 shrink-0" />
+            <span>Kampanya &amp; Damga Ayarları</span>
             {config && (
               <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md font-extrabold bg-background">
                 {targetStamps} Damga
@@ -362,7 +362,7 @@ export function LoyaltyManagerTab({
           </button>
         </div>
 
-        <div className="hidden sm:flex items-center gap-2 pr-2 text-xs font-semibold text-foreground/60">
+        <div className="hidden lg:flex items-center gap-2 pr-2 text-xs font-semibold text-foreground/60 shrink-0">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span>Sadakat Sistemi Aktif</span>
         </div>
@@ -372,29 +372,29 @@ export function LoyaltyManagerTab({
           SUBTAB 1: OPERATIONS (STAFF STAMPING & CUSTOMER LOOKUP)
           ======================================================== */}
       {subTab === "operations" && (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4 sm:gap-6 min-w-0 max-w-full">
           {/* Top Bar: Quick Search & Register */}
-          <div className="p-5 sm:p-6 rounded-3xl bg-card border border-border shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+          <div className="p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl bg-card border border-border shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/40" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/40 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
-                placeholder="Telefon no (05xx...), Müşteri Kodu (#KNT-...) veya İsim ile ara..."
-                className="w-full pl-11 pr-4 py-3 rounded-2xl border border-border bg-background text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
+                placeholder="Telefon (05xx...), Kodu (#KNT-...) veya İsim ile ara..."
+                className="w-full pl-10 pr-4 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl border border-border bg-background text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
               {isSearching && (
-                <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-primary" />
+                <Loader2 className="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-primary" />
               )}
             </div>
 
             <Button
               type="button"
               onClick={() => setIsQuickRegisterOpen(!isQuickRegisterOpen)}
-              className="px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider bg-secondary hover:bg-secondary/80 text-foreground border border-border cursor-pointer flex items-center gap-2 shrink-0"
+              className="px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-bold text-xs uppercase tracking-wider bg-secondary hover:bg-secondary/80 text-foreground border border-border cursor-pointer flex items-center justify-center gap-2 shrink-0 w-full md:w-auto"
             >
-              <UserPlus className="h-4 w-4 text-primary" />
+              <UserPlus className="h-4 w-4 text-primary shrink-0" />
               <span>Yeni Müşteri Kartı Aç</span>
             </Button>
           </div>
@@ -473,24 +473,24 @@ export function LoyaltyManagerTab({
 
           {/* Active Customer Action Console */}
           {selectedCustomer ? (
-            <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border shadow-md flex flex-col gap-6">
+            <div className="p-4 sm:p-8 rounded-2xl sm:rounded-3xl bg-card border border-border shadow-md flex flex-col gap-4 sm:gap-6">
               {/* Customer Header Info */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-                    <Coffee className="h-7 w-7" />
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-4 sm:pb-6 border-b border-border">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                    <Coffee className="h-6 w-6 sm:h-7 sm:w-7" />
                   </div>
 
-                  <div className="flex flex-col">
+                  <div className="flex flex-col min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h2 className="text-xl font-black font-heading text-foreground">
+                      <h2 className="text-lg sm:text-xl font-black font-heading text-foreground truncate">
                         {selectedCustomer.fullName}
                       </h2>
-                      <Badge className="font-mono font-black text-xs px-2.5 py-0.5 bg-secondary text-foreground">
+                      <Badge className="font-mono font-black text-[11px] sm:text-xs px-2 py-0.5 bg-secondary text-foreground shrink-0">
                         {selectedCustomer.customerCode}
                       </Badge>
                     </div>
-                    <span className="text-xs font-medium text-foreground/60 mt-0.5">
+                    <span className="text-[11px] sm:text-xs font-medium text-foreground/60 mt-0.5 truncate">
                       Tel: {selectedCustomer.phone} • Kayıt: {new Date(selectedCustomer.createdAt).toLocaleDateString("tr-TR")}
                     </span>
                   </div>
@@ -498,15 +498,15 @@ export function LoyaltyManagerTab({
 
                 {/* Free Coffee Badge if earned */}
                 {selectedCustomer.freeCoffeesAvailable > 0 && (
-                  <div className="px-4 py-2.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-extrabold text-sm flex items-center gap-2 shadow-xs">
-                    <Gift className="h-5 w-5 animate-bounce text-emerald-600 dark:text-emerald-400" />
+                  <div className="px-3.5 py-2 rounded-xl sm:rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-xs shrink-0">
+                    <Gift className="h-4 w-4 sm:h-5 sm:w-5 animate-bounce text-emerald-600 dark:text-emerald-400 shrink-0" />
                     <span>{selectedCustomer.freeCoffeesAvailable} Adet Hediye Kahvesi Var!</span>
                   </div>
                 )}
               </div>
 
               {/* Progress & Visual Stamp Cups */}
-              <div className="p-5 rounded-2xl bg-muted/40 border border-border flex flex-col gap-4">
+              <div className="p-3.5 sm:p-5 rounded-2xl bg-muted/40 border border-border flex flex-col gap-3 sm:gap-4">
                 <div className="flex items-center justify-between text-xs font-bold">
                   <span className="text-foreground/70">Mevcut Damga Durumu:</span>
                   <span className="text-foreground font-mono font-black text-sm">
@@ -515,20 +515,20 @@ export function LoyaltyManagerTab({
                 </div>
 
                 {/* Cup Grid */}
-                <div className="grid grid-cols-4 sm:grid-cols-6 gap-3 items-center">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 sm:gap-3 items-center">
                   {Array.from({ length: targetStamps }).map((_, idx) => {
                     const isFilled = idx < selectedCustomer.currentStamps
                     return (
                       <div
                         key={idx}
-                        className={`p-3.5 rounded-2xl border flex flex-col items-center justify-center gap-1 transition-all ${
+                        className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border flex flex-col items-center justify-center gap-1 transition-all ${
                           isFilled
                             ? "bg-amber-500/20 border-amber-500/40 text-amber-600 dark:text-amber-400 shadow-sm"
                             : "bg-background border-dashed border-border text-foreground/30"
                         }`}
                       >
-                        <Coffee className={`h-6 w-6 ${isFilled ? "stroke-[2.5]" : "stroke-[1.5]"}`} />
-                        <span className="text-[10px] font-mono font-black">
+                        <Coffee className={`h-5 w-5 sm:h-6 sm:w-6 ${isFilled ? "stroke-[2.5]" : "stroke-[1.5]"}`} />
+                        <span className="text-[9px] sm:text-[10px] font-mono font-black">
                           {isFilled ? `Damga ${idx + 1}` : `Boş ${idx + 1}`}
                         </span>
                       </div>
@@ -537,14 +537,14 @@ export function LoyaltyManagerTab({
 
                   {/* Free Coffee Reward Target Box */}
                   <div
-                    className={`p-3.5 rounded-2xl border flex flex-col items-center justify-center gap-1 transition-all ${
+                    className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border flex flex-col items-center justify-center gap-1 transition-all ${
                       selectedCustomer.freeCoffeesAvailable > 0
                         ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-600 dark:text-emerald-400 shadow-md ring-2 ring-emerald-500/20"
                         : "bg-amber-500/5 border-dashed border-amber-500/30 text-amber-600/50"
                     }`}
                   >
-                    <Gift className={`h-6 w-6 ${selectedCustomer.freeCoffeesAvailable > 0 ? "animate-pulse stroke-[2.5]" : "stroke-[1.5]"}`} />
-                    <span className="text-[10px] font-black uppercase tracking-tight">
+                    <Gift className={`h-5 w-5 sm:h-6 sm:w-6 ${selectedCustomer.freeCoffeesAvailable > 0 ? "animate-pulse stroke-[2.5]" : "stroke-[1.5]"}`} />
+                    <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-tight">
                       {selectedCustomer.freeCoffeesAvailable > 0 ? "Hediye Hazır!" : "Hediye"}
                     </span>
                   </div>
@@ -552,15 +552,15 @@ export function LoyaltyManagerTab({
               </div>
 
               {/* ACTION BUTTONS (Staff Stamping Controls) */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 pt-1 sm:pt-2">
                 {/* 1. Add Stamp Button */}
                 <Button
                   type="button"
                   disabled={actionLoading === selectedCustomer.id}
                   onClick={() => handleLoyaltyAction(selectedCustomer.id, "STAMP_ADD")}
-                  className="py-6 rounded-2xl font-black font-heading text-sm bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+                  className="py-4 sm:py-6 rounded-xl sm:rounded-2xl font-black font-heading text-xs sm:text-sm bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <Plus className="h-5 w-5" />
+                  <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
                   <span>+1 Kahve Damgala</span>
                 </Button>
 
@@ -572,13 +572,13 @@ export function LoyaltyManagerTab({
                     selectedCustomer.freeCoffeesAvailable <= 0
                   }
                   onClick={() => handleLoyaltyAction(selectedCustomer.id, "REDEEM_FREE")}
-                  className={`py-6 rounded-2xl font-black font-heading text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                  className={`py-4 sm:py-6 rounded-xl sm:rounded-2xl font-black font-heading text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
                     selectedCustomer.freeCoffeesAvailable > 0
                       ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/25 ring-2 ring-emerald-500/20"
                       : "bg-muted text-foreground/30 cursor-not-allowed border border-border"
                   }`}
                 >
-                  <Gift className="h-5 w-5" />
+                  <Gift className="h-4 w-4 sm:h-5 sm:w-5" />
                   <span>1 Hediye Kahveyi Kullandır</span>
                 </Button>
 
@@ -592,7 +592,7 @@ export function LoyaltyManagerTab({
                       selectedCustomer.freeCoffeesAvailable === 0)
                   }
                   onClick={() => handleLoyaltyAction(selectedCustomer.id, "STAMP_REMOVE")}
-                  className="py-6 rounded-2xl font-bold text-xs uppercase tracking-wider text-destructive hover:bg-destructive/10 hover:text-destructive border-border cursor-pointer flex items-center justify-center gap-2"
+                  className="py-4 sm:py-6 rounded-xl sm:rounded-2xl font-bold text-xs uppercase tracking-wider text-destructive hover:bg-destructive/10 hover:text-destructive border-border cursor-pointer flex items-center justify-center gap-2"
                 >
                   <RotateCcw className="h-4 w-4" />
                   <span>Son İşlemi Geri Al</span>

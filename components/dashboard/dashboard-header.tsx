@@ -27,27 +27,27 @@ export function DashboardHeader({ onOpenSidebar }: { onOpenSidebar?: () => void 
   }
 
   return (
-    <header className="h-16 border-b border-border bg-card/90 backdrop-blur-md flex items-center justify-between px-3 sm:px-6 sticky top-0 z-30">
-      <div className="flex items-center gap-2 sm:gap-3">
+    <header className="h-16 border-b border-border bg-card/90 backdrop-blur-md flex items-center justify-between px-3 sm:px-6 sticky top-0 z-30 min-w-0 max-w-full">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
         {/* Mobile Menu Trigger */}
         <button
           onClick={onOpenSidebar}
-          className="md:hidden p-2 rounded-xl bg-secondary/80 hover:bg-secondary text-foreground/80 hover:text-foreground border border-border cursor-pointer transition-all"
+          className="md:hidden p-2 rounded-xl bg-secondary/80 hover:bg-secondary text-foreground/80 hover:text-foreground border border-border cursor-pointer transition-all shrink-0"
           title="Menüyü Aç"
         >
           <Menu className="h-5 w-5" />
         </button>
 
-        <div className="flex items-center gap-2.5">
-          <div className="hidden sm:flex">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="hidden sm:flex shrink-0">
             <KonteynerLogo size="xs" shadow />
           </div>
-          <div className="flex flex-col text-left">
-            <div className="flex items-center gap-2">
-              <span className="font-heading font-black text-sm sm:text-base tracking-wide text-foreground">
+          <div className="flex flex-col text-left min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="font-heading font-black text-sm sm:text-base tracking-wide text-foreground truncate">
                 KONTEYNER
               </span>
-              <span className="px-1.5 py-0.5 rounded-md bg-primary/15 text-primary text-[9px] font-black uppercase tracking-wider">
+              <span className="px-1.5 py-0.5 rounded-md bg-primary/15 text-primary text-[8px] sm:text-[9px] font-black uppercase tracking-wider shrink-0">
                 CAFE GÖREVLİSİ
               </span>
             </div>
@@ -56,7 +56,7 @@ export function DashboardHeader({ onOpenSidebar }: { onOpenSidebar?: () => void 
       </div>
 
       {/* Right Utility Buttons */}
-      <div className="flex items-center gap-1.5 sm:gap-2">
+      <div className="flex items-center gap-1 sm:gap-2 shrink-0">
         {/* Customer Menu Preview Link */}
         <Link
           href="/menu"

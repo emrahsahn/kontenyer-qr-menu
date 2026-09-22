@@ -387,23 +387,24 @@ export function LoyaltyStampCardModal({ isOpen, onClose }: LoyaltyStampCardModal
                   </div>
 
                   {/* KVKK Consent Checkbox */}
-                  <div className="p-3 rounded-2xl border border-border bg-muted/30 flex items-start gap-2.5">
+                  <div className="p-3.5 sm:p-4 rounded-2xl border border-border bg-muted/40 flex items-start gap-3 transition-colors hover:bg-muted/60">
                     <input
                       type="checkbox"
                       id="kvkk-consent"
                       checked={kvkkConsent}
                       onChange={(e) => setKvkkConsent(e.target.checked)}
-                      className="mt-1 h-4 w-4 rounded accent-primary cursor-pointer"
+                      className="mt-0.5 h-5 w-5 rounded-md accent-primary cursor-pointer shrink-0"
                     />
-                    <label htmlFor="kvkk-consent" className="text-[11px] text-foreground/75 leading-snug cursor-pointer">
-                      Konteyner Cafe & Roastery Sadakat Programı kapsamında kişisel verilerimin işlenmesine ilişkin{" "}
+                    <label htmlFor="kvkk-consent" className="text-xs sm:text-[13px] text-foreground/85 leading-relaxed cursor-pointer select-none">
+                      Konteyner Cafe Sadakat Programı kapsamında kişisel verilerimin işlenmesine ilişkin{" "}
                       <button
                         type="button"
                         onClick={(e) => {
                           e.preventDefault()
+                          e.stopPropagation()
                           setIsKvkkModalOpen(true)
                         }}
-                        className="underline font-bold text-primary hover:text-primary/80 inline"
+                        className="inline-flex items-center font-bold text-primary underline underline-offset-4 decoration-primary/60 hover:decoration-primary px-1.5 py-0.5 rounded-lg bg-primary/10 hover:bg-primary/20 transition-all cursor-pointer text-xs sm:text-[13px] active:scale-95"
                       >
                         KVKK Aydınlatma Metni&apos;ni
                       </button>{" "}
@@ -682,7 +683,7 @@ export function LoyaltyStampCardModal({ isOpen, onClose }: LoyaltyStampCardModal
 
           <div className="text-xs text-foreground/80 leading-relaxed max-h-72 overflow-y-auto space-y-2.5 pr-2">
             <p>
-              <strong>Konteyner Cafe & Roastery</strong> olarak, 6698 sayılı Kişisel Verilerin Korunması Kanunu (&ldquo;KVKK&rdquo;) kapsamında, kahve sadakat programı üyelerimizin kişisel verilerinin güvenliğine en üst düzeyde önem veriyoruz.
+              <strong>Konteyner Cafe</strong> olarak, 6698 sayılı Kişisel Verilerin Korunması Kanunu (&ldquo;KVKK&rdquo;) kapsamında, kahve sadakat programı üyelerimizin kişisel verilerinin güvenliğine en üst düzeyde önem veriyoruz.
             </p>
             <p>
               <strong>1. İşlenen Veriler:</strong> Ad, Soyad ve Cep Telefonu Numarası.
@@ -702,7 +703,7 @@ export function LoyaltyStampCardModal({ isOpen, onClose }: LoyaltyStampCardModal
             <Button
               type="button"
               onClick={() => setIsKvkkModalOpen(false)}
-              className="w-full py-4 rounded-2xl text-xs font-bold bg-primary text-primary-foreground cursor-pointer"
+              className="w-full py-5 rounded-2xl text-sm font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-md shadow-primary/20 cursor-pointer"
             >
               Anladım ve Kapat
             </Button>

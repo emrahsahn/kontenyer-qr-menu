@@ -53,7 +53,7 @@ export default function LoginPage() {
             KONTEYNER
           </h1>
           <p className="text-xs uppercase tracking-[0.25em] font-extrabold text-muted-foreground font-serif italic">
-            CAFE &amp; ROASTERY &bull; CAFE GÖREVLİSİ PANELİ
+            CAFE GÖREVLİSİ PANELİ
           </p>
         </div>
 
@@ -129,7 +129,7 @@ export default function LoginPage() {
         {/* Footer info */}
         <div className="mt-8 text-center">
           <p className="text-[11px] text-foreground/40 font-semibold">
-            Konteyner Coffee &amp; Roastery Dijital Görevli Paneli
+            Konteyner Coffee Dijital Görevli Paneli
           </p>
         </div>
       </div>

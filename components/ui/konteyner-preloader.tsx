@@ -295,7 +295,7 @@ export function KonteynerPreloader({
             Konteyner
           </strong>
           <span className="block font-serif italic text-zinc-300 uppercase text-xs sm:text-sm tracking-[0.3em] font-semibold mb-6">
-            Coffee &amp; Roastery
+            Cafe
           </span>
 
           {/* Table Welcome Hint */}
@@ -340,7 +340,7 @@ export function KonteynerPreloader({
           <div className="logo-clip flex justify-center items-center">
             <Image
               src="/logo.png"
-              alt="Konteyner Coffee & Roastery"
+              alt="Konteyner Cafe"
               width={340}
               height={340}
               priority

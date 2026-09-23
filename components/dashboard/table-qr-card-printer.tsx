@@ -10,7 +10,9 @@ import {
   Sparkles,
   Layers,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ChevronDown,
+  Edit3
 } from "lucide-react"
 
 interface TableQrCardPrinterProps {
@@ -22,6 +24,7 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
   const [tableCount, setTableCount] = useState<number>(10)
   const [startNumber, setStartNumber] = useState<number>(1)
   const [prefix, setPrefix] = useState<string>("M-")
+  const [isCustomPrefix, setIsCustomPrefix] = useState<boolean>(false)
   const [currentPreviewIndex, setCurrentPreviewIndex] = useState<number>(0)
   const [isExporting, setIsExporting] = useState<boolean>(false)
 
@@ -160,47 +163,98 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
           </p>
         </div>
 
-        {/* Inputs */}
-        <div className="grid grid-cols-3 sm:flex items-center gap-2 sm:gap-4 w-full md:w-auto">
-          <div className="flex flex-col gap-1">
-            <label className="text-[10px] font-black uppercase text-foreground/60 tracking-wider">
-              Masa Ön Eki
-            </label>
-            <input
-              type="text"
-              value={prefix}
-              onChange={(e) => setPrefix(e.target.value)}
-              placeholder="M-"
-              className="w-full sm:w-20 px-2 sm:px-3 py-2 rounded-xl bg-secondary border border-border text-xs font-black text-foreground text-center focus:outline-none focus:border-primary"
-            />
+        {/* Mobile-Friendly Configuration Dropdowns */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5 w-full md:w-auto">
+          {/* 1. Masa Ön Eki */}
+          <div className="flex flex-col gap-1 w-full">
+            <div className="flex items-center justify-between">
+              <label className="text-[10px] font-black uppercase text-foreground/60 tracking-wider">
+                Masa Ön Eki
+              </label>
+              <button
+                type="button"
+                onClick={() => setIsCustomPrefix(!isCustomPrefix)}
+                className="text-[10px] font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
+              >
+                <Edit3 className="h-2.5 w-2.5" />
+                <span>{isCustomPrefix ? "Seçenekler" : "Özel Yaz"}</span>
+              </button>
+            </div>
+            {isCustomPrefix ? (
+              <input
+                type="text"
+                value={prefix}
+                onChange={(e) => setPrefix(e.target.value)}
+                placeholder="Örn: M-"
+                className="w-full sm:w-28 h-10 sm:h-9 px-3 rounded-xl bg-secondary border border-border text-xs font-black text-foreground text-center focus:outline-none focus:border-primary"
+              />
+            ) : (
+              <div className="relative">
+                <select
+                  value={prefix}
+                  onChange={(e) => {
+                    if (e.target.value === "__custom__") {
+                      setIsCustomPrefix(true)
+                    } else {
+                      setPrefix(e.target.value)
+                    }
+                  }}
+                  className="w-full sm:w-28 h-10 sm:h-9 px-3 pr-8 rounded-xl bg-secondary border border-border text-xs font-black text-foreground focus:outline-none focus:border-primary appearance-none cursor-pointer"
+                >
+                  <option value="M-">M- (M-01)</option>
+                  <option value="MASA-">MASA-</option>
+                  <option value="B-">B- (Bahçe)</option>
+                  <option value="T-">T- (Teras)</option>
+                  <option value="K-">K- (Konteyner)</option>
+                  <option value="V-">V- (VIP)</option>
+                  <option value="">(Ön Eksiz)</option>
+                  <option value="__custom__">✏️ Özel Yaz...</option>
+                </select>
+                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground/50 pointer-events-none" />
+              </div>
+            )}
           </div>
 
-          <div className="flex flex-col gap-1">
+          {/* 2. Başlangıç No */}
+          <div className="flex flex-col gap-1 w-full">
             <label className="text-[10px] font-black uppercase text-foreground/60 tracking-wider">
               Başlangıç No
             </label>
-            <input
-              type="number"
-              min={1}
-              max={999}
-              value={startNumber}
-              onChange={(e) => setStartNumber(Math.max(1, parseInt(e.target.value) || 1))}
-              className="w-full sm:w-20 px-2 sm:px-3 py-2 rounded-xl bg-secondary border border-border text-xs font-black text-foreground text-center focus:outline-none focus:border-primary"
-            />
+            <div className="relative">
+              <select
+                value={startNumber}
+                onChange={(e) => setStartNumber(parseInt(e.target.value) || 1)}
+                className="w-full sm:w-24 h-10 sm:h-9 px-3 pr-8 rounded-xl bg-secondary border border-border text-xs font-black text-foreground focus:outline-none focus:border-primary appearance-none cursor-pointer"
+              >
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 20, 25, 30, 40, 50, 75, 100].map((num) => (
+                  <option key={num} value={num}>
+                    No: {num < 10 ? `0${num}` : num}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground/50 pointer-events-none" />
+            </div>
           </div>
 
-          <div className="flex flex-col gap-1">
+          {/* 3. Masa Sayısı */}
+          <div className="flex flex-col gap-1 w-full">
             <label className="text-[10px] font-black uppercase text-foreground/60 tracking-wider">
               Masa Sayısı
             </label>
-            <input
-              type="number"
-              min={1}
-              max={100}
-              value={tableCount}
-              onChange={(e) => setTableCount(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
-              className="w-full sm:w-24 px-2 sm:px-3 py-2 rounded-xl bg-secondary border border-border text-xs font-black text-foreground text-center focus:outline-none focus:border-primary"
-            />
+            <div className="relative">
+              <select
+                value={tableCount}
+                onChange={(e) => setTableCount(parseInt(e.target.value) || 10)}
+                className="w-full sm:w-28 h-10 sm:h-9 px-3 pr-8 rounded-xl bg-secondary border border-border text-xs font-black text-foreground focus:outline-none focus:border-primary appearance-none cursor-pointer"
+              >
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 30, 35, 40, 45, 50, 60, 75, 100].map((count) => (
+                  <option key={count} value={count}>
+                    {count} Masa
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground/50 pointer-events-none" />
+            </div>
           </div>
         </div>
       </div>
@@ -252,7 +306,7 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
                 <div className="relative w-36 h-14">
                   <Image
                     src="/logo-black.png"
-                    alt="Konteyner Cafe & Roastery"
+                    alt="Konteyner Cafe"
                     fill
                     unoptimized
                     priority

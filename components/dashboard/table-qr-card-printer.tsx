@@ -22,6 +22,7 @@ interface TableQrCardPrinterProps {
 export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
   // Config state
   const [tableCount, setTableCount] = useState<number>(10)
+  // startNumber: -1 means "numarasız" (no number)
   const [startNumber, setStartNumber] = useState<number>(1)
   const [prefix, setPrefix] = useState<string>("M-")
   const [isCustomPrefix, setIsCustomPrefix] = useState<boolean>(false)
@@ -30,9 +31,10 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
 
   // Generate table list (All point strictly to the common menu URL)
   const tables = Array.from({ length: Math.max(1, Math.min(tableCount, 100)) }, (_, i) => {
-    const num = startNumber + i
-    const formattedNum = num < 10 ? `0${num}` : `${num}`
-    const label = `${prefix}${formattedNum}`
+    const isNumberless = startNumber === -1
+    const num = isNumberless ? i + 1 : startNumber + i
+    const formattedNum = isNumberless ? "" : (num < 10 ? `0${num}` : `${num}`)
+    const label = isNumberless ? prefix : `${prefix}${formattedNum}`
     const url = baseMenuUrl.includes("?") ? `${baseMenuUrl}&qr=konteyner` : `${baseMenuUrl}?qr=konteyner`
     return { num, formattedNum, label, url }
   })
@@ -115,17 +117,20 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
         URL.revokeObjectURL(blobURL)
       }
 
-      // 4. Draw Table Number (Bottom) e.g. "M-01"
-      ctx.fillStyle = "#000000"
-      ctx.font = "900 130px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-      ctx.textAlign = "center"
-      ctx.textBaseline = "middle"
-      ctx.fillText(tableItem.label, width / 2, 1030)
+      // 4. Draw Table Number (Bottom) e.g. "M-01" (Only if label is not empty)
+      if (tableItem.label && tableItem.label.trim().length > 0) {
+        ctx.fillStyle = "#000000"
+        ctx.font = "900 130px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+        ctx.textAlign = "center"
+        ctx.textBaseline = "middle"
+        ctx.fillText(tableItem.label, width / 2, 1030)
+      }
 
       // 5. Download image
       const dataUrl = canvas.toDataURL("image/png", 1.0)
       const link = document.createElement("a")
-      link.download = `Konteyner-Masa-Karti-${tableItem.label}.png`
+      const fileSuffix = tableItem.label && tableItem.label.trim().length > 0 ? tableItem.label.trim() : `Kart-${tableItem.num}`
+      link.download = `Konteyner-Masa-Karti-${fileSuffix}.png`
       link.href = dataUrl
       link.click()
     } catch (e) {
@@ -173,7 +178,15 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
               </label>
               <button
                 type="button"
-                onClick={() => setIsCustomPrefix(!isCustomPrefix)}
+                onClick={() => {
+                  if (isCustomPrefix) {
+                    // Seçeneklere dönerken özel yazıyı temizle, varsayılan değere al
+                    setIsCustomPrefix(false)
+                    setPrefix("M-")
+                  } else {
+                    setIsCustomPrefix(true)
+                  }
+                }}
                 className="text-[10px] font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
               >
                 <Edit3 className="h-2.5 w-2.5" />
@@ -185,8 +198,8 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
                 type="text"
                 value={prefix}
                 onChange={(e) => setPrefix(e.target.value)}
-                placeholder="Örn: M-"
-                className="w-full sm:w-28 h-10 sm:h-9 px-3 rounded-xl bg-secondary border border-border text-xs font-black text-foreground text-center focus:outline-none focus:border-primary"
+                placeholder="Örn: M- veya Masa"
+                className="w-full sm:w-32 h-10 sm:h-9 px-3 rounded-xl bg-secondary border border-border text-xs font-black text-foreground text-center focus:outline-none focus:border-primary"
               />
             ) : (
               <div className="relative">
@@ -223,10 +236,11 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
             <div className="relative">
               <select
                 value={startNumber}
-                onChange={(e) => setStartNumber(parseInt(e.target.value) || 1)}
-                className="w-full sm:w-24 h-10 sm:h-9 px-3 pr-8 rounded-xl bg-secondary border border-border text-xs font-black text-foreground focus:outline-none focus:border-primary appearance-none cursor-pointer"
+                onChange={(e) => setStartNumber(parseInt(e.target.value))}
+                className="w-full sm:w-28 h-10 sm:h-9 px-3 pr-8 rounded-xl bg-secondary border border-border text-xs font-black text-foreground focus:outline-none focus:border-primary appearance-none cursor-pointer"
               >
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 20, 25, 30, 40, 50, 75, 100].map((num) => (
+                <option value={-1}>Numarasız</option>
+                {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
                   <option key={num} value={num}>
                     No: {num < 10 ? `0${num}` : num}
                   </option>
@@ -239,22 +253,26 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
           {/* 3. Masa Sayısı */}
           <div className="flex flex-col gap-1 w-full">
             <label className="text-[10px] font-black uppercase text-foreground/60 tracking-wider">
-              Masa Sayısı
+              Masa Sayısı (1-100)
             </label>
-            <div className="relative">
-              <select
-                value={tableCount}
-                onChange={(e) => setTableCount(parseInt(e.target.value) || 10)}
-                className="w-full sm:w-28 h-10 sm:h-9 px-3 pr-8 rounded-xl bg-secondary border border-border text-xs font-black text-foreground focus:outline-none focus:border-primary appearance-none cursor-pointer"
-              >
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 30, 35, 40, 45, 50, 60, 75, 100].map((count) => (
-                  <option key={count} value={count}>
-                    {count} Masa
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-foreground/50 pointer-events-none" />
-            </div>
+            <input
+              type="number"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              min={1}
+              max={100}
+              value={tableCount}
+              onChange={(e) => {
+                const val = parseInt(e.target.value, 10)
+                if (isNaN(val)) {
+                  setTableCount(1)
+                } else {
+                  setTableCount(Math.min(100, Math.max(1, val)))
+                }
+              }}
+              placeholder="1-100"
+              className="w-full sm:w-28 h-10 sm:h-9 px-3 rounded-xl bg-secondary border border-border text-xs font-black text-foreground text-center focus:outline-none focus:border-primary"
+            />
           </div>
         </div>
       </div>
@@ -326,10 +344,12 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
               </div>
 
               {/* 3. Bottom: Table Number e.g. M-01 */}
-              <div className="w-full text-center pb-2">
-                <span className="font-sans font-black text-3xl sm:text-4xl text-black tracking-wider leading-none">
-                  {currentTable.label}
-                </span>
+              <div className="w-full text-center pb-2 min-h-[32px] flex items-center justify-center">
+                {currentTable.label && currentTable.label.trim().length > 0 ? (
+                  <span className="font-sans font-black text-3xl sm:text-4xl text-black tracking-wider leading-none">
+                    {currentTable.label}
+                  </span>
+                ) : null}
               </div>
             </div>
           </div>
@@ -367,13 +387,14 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
                 className="flex items-center justify-center gap-2 px-4 sm:px-5 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-secondary hover:bg-secondary/80 border border-border text-foreground font-black text-xs uppercase tracking-wider transition-all cursor-pointer"
               >
                 <Download className="h-4 w-4 text-primary shrink-0" />
-                <span>Seçili Kartı İndir ({currentTable.label})</span>
+                <span>Seçili Kartı İndir {currentTable.label ? `(${currentTable.label})` : `(#${currentTable.num})`}</span>
               </button>
             </div>
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-2 border-t border-border">
               <span className="text-xs text-foreground/60 font-semibold">
-                Toplam <strong>{tables.length}</strong> masa kartı hazırlandı ({tables[0]?.label} — {tables[tables.length - 1]?.label}).
+                Toplam <strong>{tables.length}</strong> masa kartı hazırlandı
+                {tables[0]?.label ? ` (${tables[0].label} — ${tables[tables.length - 1]?.label})` : ""}.
               </span>
               <button
                 type="button"
@@ -405,13 +426,12 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
                   key={table.num}
                   type="button"
                   onClick={() => setCurrentPreviewIndex(idx)}
-                  className={`py-2 px-1 rounded-xl text-xs font-black transition-all cursor-pointer border ${
-                    currentPreviewIndex === idx
-                      ? "bg-primary text-primary-foreground border-primary shadow-md scale-105"
-                      : "bg-secondary hover:bg-muted text-foreground border-border"
-                  }`}
+                  className={`py-2 px-1 rounded-xl text-xs font-black transition-all cursor-pointer border ${currentPreviewIndex === idx
+                    ? "bg-primary text-primary-foreground border-primary shadow-md scale-105"
+                    : "bg-secondary hover:bg-muted text-foreground border-border"
+                    }`}
                 >
-                  {table.label}
+                  {table.label || `Kart #${table.num}`}
                 </button>
               ))}
             </div>
@@ -423,7 +443,8 @@ export function TableQrCardPrinter({ baseMenuUrl }: TableQrCardPrinterProps) {
       {/* HIDDEN PRINT CONTAINER (Rendered ONLY during window.print() on A4 paper) */}
       {/* ========================================================================= */}
       <div className="hidden print:block print:w-full print:bg-white print:text-black">
-        <style dangerouslySetInnerHTML={{ __html: `
+        <style dangerouslySetInnerHTML={{
+          __html: `
           @media print {
             @page {
               size: A4 portrait;

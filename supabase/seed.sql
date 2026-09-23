@@ -64,3 +64,18 @@ ON CONFLICT (id) DO UPDATE SET
     gorsel_url = EXCLUDED.gorsel_url,
     ozellikler = EXCLUDED.ozellikler,
     aktif = EXCLUDED.aktif;
+
+-- 3. SADAKAT KARTI & DAMGA VERİTABANI TABLOSU
+CREATE TABLE IF NOT EXISTS public.loyalty_store (
+    key TEXT PRIMARY KEY,
+    data JSONB NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.loyalty_store ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Herkes loyalty_store okuyabilir" 
+ON public.loyalty_store FOR SELECT USING (true);
+
+CREATE POLICY "Herkes loyalty_store yazabilir" 
+ON public.loyalty_store FOR ALL USING (true) WITH CHECK (true);

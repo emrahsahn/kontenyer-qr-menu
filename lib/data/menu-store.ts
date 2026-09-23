@@ -85,7 +85,7 @@ function getRedisClient(): Redis | null {
 export async function getMenuStore(): Promise<MenuStoreData> {
   const now = Date.now()
 
-  // 0. Return from in-memory cache if fresh (avoids redundant Redis network calls)
+  // 0. Return from in-memory cache if fresh
   if (
     globalThis.__konteynerMenuData &&
     globalThis.__konteynerMenuLastFetch &&
@@ -95,34 +95,7 @@ export async function getMenuStore(): Promise<MenuStoreData> {
     return globalThis.__konteynerMenuData
   }
 
-  const redis = getRedisClient()
-
-  // 1. Upstash Redis (Vercel KV)
-  if (redis) {
-    try {
-      const data = await redis.get<MenuStoreData | string>("konteyner_menu_data_v1")
-      if (data) {
-        const parsed = typeof data === "string" ? JSON.parse(data) : data
-        if (parsed && Array.isArray(parsed.categories) && Array.isArray(parsed.products) && parsed.products.length > 0) {
-          globalThis.__konteynerMenuData = parsed
-          globalThis.__konteynerMenuLastFetch = now
-          return parsed
-        }
-      }
-      // If Redis is fresh and empty, auto-seed with local initial menu data
-      const defaultData = getLocalFileDefaults()
-      if (defaultData.products.length > 0) {
-        await redis.set("konteyner_menu_data_v1", defaultData)
-        globalThis.__konteynerMenuData = defaultData
-        globalThis.__konteynerMenuLastFetch = now
-        return defaultData
-      }
-    } catch (err) {
-      console.warn("Notice: Upstash Redis get error, using fallback:", err)
-    }
-  }
-
-  // 2. Supabase if configured
+  // 1. Supabase (Primary Cloud Database if configured)
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const isSupabaseConfigured = supabaseUrl && supabaseUrl !== "your-supabase-url"
   if (isSupabaseConfigured) {
@@ -134,17 +107,80 @@ export async function getMenuStore(): Promise<MenuStoreData> {
           supabase.from("products").select("*").order("created_at", { ascending: false })
         ])
 
-        if (catRes.data && prodRes.data && catRes.data.length > 0) {
+        if (catRes.data && catRes.data.length > 0) {
           const store: MenuStoreData = {
             categories: catRes.data as Category[],
-            products: prodRes.data as Product[]
+            products: (prodRes.data || []) as Product[]
           }
           globalThis.__konteynerMenuData = store
+          globalThis.__konteynerMenuLastFetch = now
           return store
+        }
+
+        // If Supabase tables exist but are empty, auto-seed with local file defaults
+        const defaultData = getLocalFileDefaults()
+        if (defaultData.categories.length > 0) {
+          try {
+            await supabase.from("categories").upsert(
+              defaultData.categories.map((c) => ({
+                id: c.id,
+                ad_tr: c.ad_tr,
+                ad_en: c.ad_en,
+                sira: c.sira
+              }))
+            )
+            if (defaultData.products.length > 0) {
+              await supabase.from("products").upsert(
+                defaultData.products.map((p) => ({
+                  id: p.id,
+                  kategori_id: p.kategori_id,
+                  ad_tr: p.ad_tr,
+                  ad_en: p.ad_en,
+                  aciklama_tr: p.aciklama_tr,
+                  aciklama_en: p.aciklama_en,
+                  fiyat: p.fiyat,
+                  porsiyonlar: p.porsiyonlar || [],
+                  gorsel_url: p.gorsel_url,
+                  ozellikler: p.ozellikler || {},
+                  aktif: p.aktif
+                }))
+              )
+            }
+          } catch (seedErr) {
+            console.warn("Supabase auto-seed notice:", seedErr)
+          }
+          globalThis.__konteynerMenuData = defaultData
+          globalThis.__konteynerMenuLastFetch = now
+          return defaultData
         }
       }
     } catch (e) {
-      console.warn("Supabase fetch error, falling back to memory/file:", e)
+      console.warn("Supabase fetch error, falling back to cache/Redis/file:", e)
+    }
+  }
+
+  // 2. Upstash Redis (Vercel KV Fallback)
+  const redis = getRedisClient()
+  if (redis) {
+    try {
+      const data = await redis.get<MenuStoreData | string>("konteyner_menu_data_v1")
+      if (data) {
+        const parsed = typeof data === "string" ? JSON.parse(data) : data
+        if (parsed && Array.isArray(parsed.categories) && Array.isArray(parsed.products) && parsed.products.length > 0) {
+          globalThis.__konteynerMenuData = parsed
+          globalThis.__konteynerMenuLastFetch = now
+          return parsed
+        }
+      }
+      const defaultData = getLocalFileDefaults()
+      if (defaultData.products.length > 0) {
+        await redis.set("konteyner_menu_data_v1", defaultData)
+        globalThis.__konteynerMenuData = defaultData
+        globalThis.__konteynerMenuLastFetch = now
+        return defaultData
+      }
+    } catch (err) {
+      console.warn("Notice: Upstash Redis get error, using fallback:", err)
     }
   }
 
@@ -257,12 +293,15 @@ export async function saveProduct(productData: Partial<Product>): Promise<Produc
         aciklama_tr: product.aciklama_tr,
         aciklama_en: product.aciklama_en,
         fiyat: product.fiyat,
+        porsiyonlar: product.porsiyonlar || [],
         gorsel_url: product.gorsel_url,
-        ozellikler: product.ozellikler,
+        ozellikler: product.ozellikler || {},
         aktif: product.aktif
       })
     }
-  } catch {}
+  } catch (err) {
+    console.error("Supabase saveProduct error:", err)
+  }
 
   await persistMenuStore(store)
   return product

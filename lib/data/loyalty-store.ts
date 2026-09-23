@@ -1,6 +1,7 @@
 import fs from "fs"
 import path from "path"
 import { Redis } from "@upstash/redis"
+import { createClient } from "@/lib/supabase/server"
 import {
   LoyaltyStoreData,
   LoyaltyCampaignConfig,
@@ -98,7 +99,51 @@ export async function getLoyaltyStore(): Promise<LoyaltyStoreData> {
     return globalThis.__konteynerLoyaltyData
   }
 
-  // 1. Upstash Redis
+  // 1. Supabase (Primary Cloud Database if configured)
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const isSupabaseConfigured = supabaseUrl && supabaseUrl !== "your-supabase-url"
+  if (isSupabaseConfigured) {
+    try {
+      const supabase = await createClient()
+      if (supabase) {
+        const { data: row, error } = await supabase
+          .from("loyalty_store")
+          .select("data")
+          .eq("key", REDIS_LOYALTY_KEY)
+          .maybeSingle()
+
+        if (row && row.data) {
+          const store = row.data as LoyaltyStoreData
+          if (store && store.config && Array.isArray(store.customers)) {
+            globalThis.__konteynerLoyaltyData = store
+            globalThis.__konteynerLoyaltyLastFetch = now
+            return store
+          }
+        }
+
+        // If table is ready but row not yet created, auto-seed with local/default data
+        if (!error && !row) {
+          const defaultData = getLocalFileStore()
+          try {
+            await supabase.from("loyalty_store").upsert({
+              key: REDIS_LOYALTY_KEY,
+              data: defaultData,
+              updated_at: new Date().toISOString()
+            })
+          } catch (seedErr) {
+            console.warn("Supabase loyalty auto-seed error:", seedErr)
+          }
+          globalThis.__konteynerLoyaltyData = defaultData
+          globalThis.__konteynerLoyaltyLastFetch = now
+          return defaultData
+        }
+      }
+    } catch (e) {
+      console.warn("Supabase loyalty fetch error, falling back:", e)
+    }
+  }
+
+  // 2. Upstash Redis (Fallback)
   const redis = getRedisClient()
   if (redis) {
     try {
@@ -123,7 +168,7 @@ export async function getLoyaltyStore(): Promise<LoyaltyStoreData> {
     }
   }
 
-  // 2. Local File / Memory Fallback
+  // 3. Local File / Memory Fallback
   if (!globalThis.__konteynerLoyaltyData) {
     globalThis.__konteynerLoyaltyData = getLocalFileStore()
     globalThis.__konteynerLoyaltyLastFetch = now
@@ -135,7 +180,25 @@ export async function persistLoyaltyStore(data: LoyaltyStoreData): Promise<boole
   globalThis.__konteynerLoyaltyData = data
   globalThis.__konteynerLoyaltyLastFetch = Date.now()
 
-  // 1. Upstash Redis
+  // 1. Supabase (Primary Cloud Database if configured)
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const isSupabaseConfigured = supabaseUrl && supabaseUrl !== "your-supabase-url"
+  if (isSupabaseConfigured) {
+    try {
+      const supabase = await createClient()
+      if (supabase) {
+        await supabase.from("loyalty_store").upsert({
+          key: REDIS_LOYALTY_KEY,
+          data: data,
+          updated_at: new Date().toISOString()
+        })
+      }
+    } catch (err) {
+      console.warn("Notice: Supabase persist loyalty error:", err)
+    }
+  }
+
+  // 2. Upstash Redis Fallback
   const redis = getRedisClient()
   if (redis) {
     try {
@@ -145,7 +208,7 @@ export async function persistLoyaltyStore(data: LoyaltyStoreData): Promise<boole
     }
   }
 
-  // 2. Local File System
+  // 3. Local File System Fallback
   try {
     const dir = path.dirname(LOYALTY_FILE_PATH)
     if (!fs.existsSync(dir)) {

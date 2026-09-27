@@ -25,14 +25,18 @@ END $$;
 ALTER TABLE public.loyalty_store ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON TABLE public.loyalty_store FROM anon, authenticated;
 
--- 2) categories: RLS aç + herkese açık okuma
+-- 2) categories: RLS aç + eski politikaları temizle + herkese açık okuma
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Herkes kategorileri görebilir" ON public.categories;
+DROP POLICY IF EXISTS "Kategorileri yönetme izni" ON public.categories;
 DROP POLICY IF EXISTS "Kategoriler herkese açık okunur" ON public.categories;
 CREATE POLICY "Kategoriler herkese açık okunur"
   ON public.categories FOR SELECT USING (true);
 
--- 3) products: RLS aç + herkese açık okuma
+-- 3) products: RLS aç + eski politikaları temizle + herkese açık okuma
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Herkes ürünleri görebilir" ON public.products;
+DROP POLICY IF EXISTS "Ürünleri yönetme izni" ON public.products;
 DROP POLICY IF EXISTS "Ürünler herkese açık okunur" ON public.products;
 CREATE POLICY "Ürünler herkese açık okunur"
   ON public.products FOR SELECT USING (true);

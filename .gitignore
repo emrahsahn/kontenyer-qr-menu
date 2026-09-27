@@ -26,6 +26,10 @@ QR_SISTEM_MIMARISI_VE_SUBE_UYARLAMA_REHBERI.md
 .env.test.local
 .env.production.local
 
+# Yedek bundle dosyaları (eski sırlar içerebilir — commit'lemeyin)
+*.bundle
+kontenyer-YEDEK*
+
 # Vercel
 .vercel
 

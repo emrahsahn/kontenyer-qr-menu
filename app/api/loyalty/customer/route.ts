@@ -5,7 +5,8 @@ import {
   registerCustomer,
   getAllCustomers,
   deleteCustomer,
-  updateCustomer
+  updateCustomer,
+  normalizePhone
 } from "@/lib/data/loyalty-store"
 import { verifyStaffSession } from "@/lib/security/auth-guard"
 import { checkGeneralRateLimit } from "@/lib/security/rate-limiter"
@@ -16,9 +17,41 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get("id")
     const q = searchParams.get("q")
+    const auth = verifyStaffSession(request)
 
-    // 1. Direct fetch by ID (Used by customer's phone when loading own card)
+    // 1. Direct fetch by ID
+    //    - Staff (cookie/token): unrestricted
+    //    - Public (customer phone): phone ownership proof + rate limit required
     if (id) {
+      if (!auth.authenticated) {
+        const forwarded = request.headers.get("x-forwarded-for")
+        const ip = forwarded ? forwarded.split(",")[0].trim() : request.headers.get("x-real-ip") || "127.0.0.1"
+        const rateLimit = checkGeneralRateLimit(`loyalty_card_${ip}_${id}`, 30, 60 * 1000)
+
+        if (!rateLimit.allowed) {
+          return NextResponse.json(
+            {
+              error: `Çok fazla istek yapıldı. Güvenliğiniz için lütfen ${rateLimit.retryAfterSeconds} saniye sonra tekrar deneyiniz.`
+            },
+            { status: 429 }
+          )
+        }
+
+        const phone = searchParams.get("phone")
+        if (!phone) {
+          return NextResponse.json(
+            { error: "Kart bilgilerini görüntülemek için telefon doğrulaması gereklidir." },
+            { status: 401 }
+          )
+        }
+
+        const customer = await getCustomerById(id)
+        if (!customer || normalizePhone(customer.phone) !== normalizePhone(phone)) {
+          return NextResponse.json({ error: "Müşteri bulunamadı." }, { status: 404 })
+        }
+        return NextResponse.json({ customer })
+      }
+
       const customer = await getCustomerById(id)
       if (!customer) {
         return NextResponse.json({ error: "Müşteri bulunamadı." }, { status: 404 })
@@ -28,7 +61,6 @@ export async function GET(request: NextRequest) {
 
     // 2. Search query (Phone, Code, Name - Staff Panel)
     if (q) {
-      const auth = verifyStaffSession(request)
       if (!auth.authenticated) {
         return NextResponse.json(
           { error: "Arama yapmak için personel girişi gereklidir." },
@@ -41,7 +73,6 @@ export async function GET(request: NextRequest) {
     }
 
     // 3. All Customers List (Staff Panel)
-    const auth = verifyStaffSession(request)
     if (!auth.authenticated) {
       return NextResponse.json(
         { error: "Müşteri listesini görüntülemek için personel girişi gereklidir." },

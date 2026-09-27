@@ -1,7 +1,7 @@
 import fs from "fs"
 import path from "path"
 import { Redis } from "@upstash/redis"
-import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import {
   LoyaltyStoreData,
   LoyaltyCampaignConfig,
@@ -104,7 +104,7 @@ export async function getLoyaltyStore(): Promise<LoyaltyStoreData> {
   const isSupabaseConfigured = supabaseUrl && supabaseUrl !== "your-supabase-url"
   if (isSupabaseConfigured) {
     try {
-      const supabase = await createClient()
+      const supabase = createAdminClient()
       if (supabase) {
         const { data: row, error } = await supabase
           .from("loyalty_store")
@@ -185,7 +185,7 @@ export async function persistLoyaltyStore(data: LoyaltyStoreData): Promise<boole
   const isSupabaseConfigured = supabaseUrl && supabaseUrl !== "your-supabase-url"
   if (isSupabaseConfigured) {
     try {
-      const supabase = await createClient()
+      const supabase = createAdminClient()
       if (supabase) {
         await supabase.from("loyalty_store").upsert({
           key: REDIS_LOYALTY_KEY,

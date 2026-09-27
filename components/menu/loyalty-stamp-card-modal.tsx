@@ -82,9 +82,11 @@ export function LoyaltyStampCardModal({ isOpen, onClose }: LoyaltyStampCardModal
 
   // 2. Active Customer Status Verifier & Syncer
   const checkCustomerStatus = useCallback(
-    async (customerId: string, silent = false) => {
+    async (customerId: string, phone: string, silent = false) => {
       try {
-        const res = await fetch(`/api/loyalty/customer?id=${encodeURIComponent(customerId)}`, {
+        const params = new URLSearchParams({ id: customerId })
+        if (phone) params.set("phone", phone)
+        const res = await fetch(`/api/loyalty/customer?${params.toString()}`, {
           cache: "no-store"
         })
 
@@ -119,16 +121,18 @@ export function LoyaltyStampCardModal({ isOpen, onClose }: LoyaltyStampCardModal
 
   // 3. Manual Refresh Handler
   const handleManualRefresh = useCallback(async () => {
-    if (!customer?.id) return
-    await checkCustomerStatus(customer.id)
-  }, [customer?.id, checkCustomerStatus])
+    if (!customer) return
+    await checkCustomerStatus(customer.id, customer.phone)
+  }, [customer, checkCustomerStatus])
 
   // 4. Background verification on initial mount (cleans ghost records if already deleted)
   useEffect(() => {
     if (!customer?.id) return
     let active = true
 
-    fetch(`/api/loyalty/customer?id=${encodeURIComponent(customer.id)}`, { cache: "no-store" })
+    const params = new URLSearchParams({ id: customer.id })
+    if (customer.phone) params.set("phone", customer.phone)
+    fetch(`/api/loyalty/customer?${params.toString()}`, { cache: "no-store" })
       .then((res) => {
         if (res.status === 404 && active) {
           handleResetSession()
@@ -139,16 +143,12 @@ export function LoyaltyStampCardModal({ isOpen, onClose }: LoyaltyStampCardModal
     return () => {
       active = false
     }
-  }, [customer?.id, handleResetSession])
+  }, [customer?.id, customer?.phone, handleResetSession])
 
-  // 5. Initial load config & card status sync on modal open
+  // 5. Initial load config on modal open (card status sync is handled by the polling effect below)
   useEffect(() => {
     if (!isOpen) return
     let active = true
-
-    if (customer?.id) {
-      checkCustomerStatus(customer.id)
-    }
 
     fetch("/api/loyalty/config", { cache: "no-store" })
       .then((res) => res.json())
@@ -165,23 +165,26 @@ export function LoyaltyStampCardModal({ isOpen, onClose }: LoyaltyStampCardModal
     return () => {
       active = false
     }
-  }, [isOpen, customer?.id, checkCustomerStatus])
+  }, [isOpen])
 
-  // 6. Active polling while modal is OPEN (instantly detects deletions or remote stamp updates)
+  // 6. Active polling while modal is OPEN (immediate sync + instantly detects deletions or remote stamp updates)
   useEffect(() => {
     if (!isOpen || !customer?.id) return
-    const interval = setInterval(() => {
-      checkCustomerStatus(customer.id, true)
-    }, 4000)
-    return () => clearInterval(interval)
-  }, [isOpen, customer?.id, checkCustomerStatus])
+    const tick = () => checkCustomerStatus(customer.id, customer.phone, true)
+    const initial = setTimeout(tick, 0)
+    const interval = setInterval(tick, 4000)
+    return () => {
+      clearTimeout(initial)
+      clearInterval(interval)
+    }
+  }, [isOpen, customer?.id, customer?.phone, checkCustomerStatus])
 
   // 7. Sync on window focus or visibility change
   useEffect(() => {
     if (!customer?.id) return
     const handleSync = () => {
       if (document.visibilityState === "visible") {
-        checkCustomerStatus(customer.id, true)
+        checkCustomerStatus(customer.id, customer.phone, true)
       }
     }
     window.addEventListener("focus", handleSync)
@@ -190,7 +193,7 @@ export function LoyaltyStampCardModal({ isOpen, onClose }: LoyaltyStampCardModal
       window.removeEventListener("focus", handleSync)
       document.removeEventListener("visibilitychange", handleSync)
     }
-  }, [customer?.id, checkCustomerStatus])
+  }, [customer?.id, customer?.phone, checkCustomerStatus])
 
   // 8. Real-time BroadcastChannel listener
   useEffect(() => {
@@ -203,7 +206,7 @@ export function LoyaltyStampCardModal({ isOpen, onClose }: LoyaltyStampCardModal
           if (event.data?.type === "CUSTOMER_DELETED") {
             handleResetSession("Kayıtlı sadakat kartınız sistemden kaldırılmıştır.")
           } else {
-            checkCustomerStatus(customer.id)
+            checkCustomerStatus(customer.id, customer.phone)
           }
         }
       }
@@ -213,7 +216,7 @@ export function LoyaltyStampCardModal({ isOpen, onClose }: LoyaltyStampCardModal
     } catch {
       // BroadcastChannel not supported fallback
     }
-  }, [customer?.id, checkCustomerStatus, handleResetSession])
+  }, [customer?.id, customer?.phone, checkCustomerStatus, handleResetSession])
 
   // Step 1: Proceed to Confirmation Screen
   const handleProceedToConfirm = (e?: React.FormEvent) => {

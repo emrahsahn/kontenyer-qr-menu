@@ -72,10 +72,19 @@ CREATE TABLE IF NOT EXISTS public.loyalty_store (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- GÜVENLİK: Bu tablo müşteri adı, telefonu ve KVKK onayı içerir.
+-- Anon/authenticated erişimi tamamen kapalıdır (hiçbir policy tanımlanmaz).
+-- Uygulama bu tabloya yalnızca sunucu tarafındaki SUPABASE_SERVICE_ROLE_KEY ile erişir (RLS'i baypas eder).
 ALTER TABLE public.loyalty_store ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Herkes loyalty_store okuyabilir" 
-ON public.loyalty_store FOR SELECT USING (true);
+-- 4. RLS: MENÜ TABLOLARI (herkese açık YALNIZCA okuma; yazma service-role ile)
+ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Herkes loyalty_store yazabilir" 
-ON public.loyalty_store FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Kategoriler herkese açık okunur" ON public.categories;
+CREATE POLICY "Kategoriler herkese açık okunur"
+ON public.categories FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Ürünler herkese açık okunur" ON public.products;
+CREATE POLICY "Ürünler herkese açık okunur"
+ON public.products FOR SELECT USING (true);

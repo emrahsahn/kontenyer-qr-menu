@@ -1,0 +1,4 @@
+# Dil istatistiklerinden sayfa/mimari dokümanlarını çıkar
+# (GitHub Linguist HTML olarak saymasın, proje TS/JS görünsün)
+konteyner-architecture.html linguist-documentation
+public/restaurant/offline.html linguist-documentation

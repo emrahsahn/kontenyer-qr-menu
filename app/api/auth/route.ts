@@ -163,15 +163,6 @@ export async function POST(request: NextRequest) {
       path: "/",
       maxAge: 60 * 60 * 24 * 7 // 7 days
     })
-    response.cookies.set({
-      name: "yali_staff_auth",
-      value: sessionToken,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7
-    })
 
     return response
   } catch (error) {
@@ -185,15 +176,6 @@ export async function DELETE() {
   const response = NextResponse.json({ success: true })
   response.cookies.set({
     name: "konteyner_staff_auth",
-    value: "",
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 0
-  })
-  response.cookies.set({
-    name: "yali_staff_auth",
     value: "",
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

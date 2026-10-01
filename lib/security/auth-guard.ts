@@ -83,13 +83,11 @@ export function verifySessionToken(token: string): { valid: boolean; username?: 
 
 /**
  * Checks if the incoming NextRequest carries a valid, authenticated staff session
- * either in the HttpOnly cookie (`yali_staff_auth`) or the `Authorization: Bearer <token>` header.
+ * either in the HttpOnly cookie (`konteyner_staff_auth`) or the `Authorization: Bearer <token>` header.
  */
 export function verifyStaffSession(request: NextRequest): { authenticated: boolean; username?: string } {
   // 1. Check HttpOnly cookie
-  const cookieToken =
-    request.cookies.get("konteyner_staff_auth")?.value ||
-    request.cookies.get("yali_staff_auth")?.value
+  const cookieToken = request.cookies.get("konteyner_staff_auth")?.value
   if (cookieToken) {
     const result = verifySessionToken(cookieToken)
     if (result.valid) {

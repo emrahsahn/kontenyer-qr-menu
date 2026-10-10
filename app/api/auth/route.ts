@@ -10,6 +10,12 @@ import {
   createSignedSessionToken,
   verifyStaffSession
 } from "@/lib/security/auth-guard"
+import {
+  logLoginSuccess,
+  logLoginFailed,
+  logLoginBlocked,
+  logLogout
+} from "@/lib/vercel-watch-logger"
 
 // Helper to safely extract client IP
 function getClientIp(request: NextRequest): string {
@@ -84,6 +90,7 @@ export async function POST(request: NextRequest) {
     const rateLimit = checkRateLimit(ip, cleanUsername)
 
     if (rateLimit.isBlocked) {
+      logLoginBlocked({ username: cleanUsername, req: request })
       const minutes = Math.ceil((rateLimit.retryAfterSeconds || 120) / 60)
       const targetLabel = rateLimit.blockedTarget === "user" ? "bu kullanıcı hesabı" : "bu cihaz / IP"
       return NextResponse.json(
@@ -119,6 +126,7 @@ export async function POST(request: NextRequest) {
       await applyProgressiveDelay(updatedLimit.attemptCount)
 
       if (updatedLimit.isBlocked) {
+        logLoginBlocked({ username: cleanUsername, req: request })
         const minutes = Math.ceil((updatedLimit.retryAfterSeconds || 120) / 60)
         return NextResponse.json(
           {
@@ -128,6 +136,7 @@ export async function POST(request: NextRequest) {
         )
       }
 
+      logLoginFailed({ username: cleanUsername, req: request })
       return NextResponse.json(
         {
           error: `Giriş bilgileri hatalı. (Kalan deneme hakkı: ${updatedLimit.remainingAttempts})`
@@ -138,6 +147,8 @@ export async function POST(request: NextRequest) {
 
     // 3. Successful login: reset failed attempts for both IP and Username
     resetAttempts(ip, cleanUsername)
+
+    logLoginSuccess({ username: cleanUsername, req: request })
 
     // Generate tamper-proof HMAC-signed session token
     const sessionToken = createSignedSessionToken(cleanUsername)
@@ -172,7 +183,13 @@ export async function POST(request: NextRequest) {
 }
 
 // DELETE: Çıkış yap ve oturum çerezini sil
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
+  const auth = verifyStaffSession(request)
+  logLogout({
+    username: auth.username || "staff",
+    req: request
+  })
+
   const response = NextResponse.json({ success: true })
   response.cookies.set({
     name: "konteyner_staff_auth",

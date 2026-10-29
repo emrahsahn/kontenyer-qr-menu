@@ -12,23 +12,29 @@ export const DEVELOPER_CONFIG = {
   // Geliştirici İsmi (2. Satır)
   name: "Emrah SAHIN",
 
-  // LinkedIn Profil URL'niz (3. Satır)
-  linkedinUrl: "https://www.linkedin.com/in/emrah-şahin/",
-  linkedinLabel: "LinkedIn",
+  // Web Sitesi Profil URL'niz (3. Satır)
+  websiteUrl: "https://personal-website-emrah.vercel.app/tr",
+  websiteLabel: "Web Sitesi",
 
   // Instagram Kullanıcı Adınız (@ olmadan - 3. Satır)
   instagramUsername: "shn__emrah"
 }
 
-// Minimal LinkedIn SVG Icon
-function LinkedinIcon({ className = "h-3 w-3" }: { className?: string }) {
+// Minimal Web / Globe SVG Icon
+function GlobeIcon({ className = "h-3 w-3" }: { className?: string }) {
   return (
     <svg
       className={className}
       viewBox="0 0 24 24"
-      fill="currentColor"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+      <path d="M2 12h20" />
     </svg>
   )
 }
@@ -68,17 +74,17 @@ export function DeveloperFooter() {
           {DEVELOPER_CONFIG.name}
         </p>
 
-        {/* 3. Satır: LinkedIn & Instagram Adresleri */}
+        {/* 3. Satır: Web Sitesi & Instagram Adresleri */}
         <div className="flex flex-wrap items-center justify-center gap-3 text-[11px] font-medium text-foreground/60 pt-0.5">
-          {/* LinkedIn */}
+          {/* Web Sitesi */}
           <a
-            href={DEVELOPER_CONFIG.linkedinUrl}
+            href={DEVELOPER_CONFIG.websiteUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-primary hover:underline transition-colors flex items-center gap-1.5 cursor-pointer"
           >
-            <LinkedinIcon className="h-3 w-3 opacity-80 text-[#0A66C2] dark:text-[#70B5F9]" />
-            <span>{DEVELOPER_CONFIG.linkedinLabel}</span>
+            <GlobeIcon className="h-3 w-3 opacity-80" />
+            <span>{DEVELOPER_CONFIG.websiteLabel}</span>
           </a>
 
           <span className="text-foreground/25">•</span>
